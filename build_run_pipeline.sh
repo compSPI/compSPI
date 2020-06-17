@@ -27,8 +27,13 @@ fi
 
 # Run pipeline
 cd ..
+singularity run --bind /sdf/group/cryoem/g/ML/vaegan/:/data/cryo/ \
+		--bind /scratch/${USER}/:/results/ \
+		--nv $SIMGS_DIR/$img_name
+'''
 singularity run --bind /scratch/:/scratch/ \
                 --bind /neuro/:/data/neuro/ \
                 --bind /cryo/:/data/cryo/ \
                 --bind /scratch/users/nmiolane/:/results/ \
                 --nv $SIMGS_DIR/$img_name
+'''
