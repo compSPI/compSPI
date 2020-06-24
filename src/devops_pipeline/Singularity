@@ -1,5 +1,5 @@
 Bootstrap: localimage
-From: ../../simgs/base.simg
+From: ../../../simgs/base.simg
 
 %environment
     LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64
@@ -17,13 +17,10 @@ From: ../../simgs/base.simg
     curl http://neuro.debian.net/lists/xenial.de-m.full | tee /etc/apt/sources.list.d/neurodebian.sources.list
     apt-get update
     pip3 install --upgrade setuptools
-    pip3 install git+git://github.com/geomstats/geomstats.git@nina-s2-pytorch
     pip3 install --upgrade git+git://github.com/hyperopt/hyperopt.git
     pip3 install jinja2 \
                  joblib \
                  luigi \
-                 nibabel \
-                 nilearn \
                  numpy==1.15.1 \
                  psutil \
                  ray \
@@ -31,7 +28,6 @@ From: ../../simgs/base.simg
                  scikit-learn \
                  seaborn \
                  setproctitle \
-                 sympy \
                  torch==1.0.1 \
                  torchvision \
                  visdom
