@@ -32,9 +32,13 @@ import train_utils
 import warnings
 warnings.filterwarnings("ignore")
 
-# OUTPUT_DIR = '/scratch/deebanr'
-OUTPUT_DIR = '../results'
+# Slacgpu output directory to store results of running VAEGAN code
+OUTPUT_DIR = '/scratch/deebanr'
 
+# Local output directory to store results of running VAEGAN code
+# OUTPUT_DIR = '../results'
+
+# Option to run VAEGAN code with Ray
 WITH_RAY = True
 
 SERVER_NAME = 'slacgpu'
@@ -749,7 +753,7 @@ if __name__ == "__main__":
 
         analysis = tune.run(
             Train,
-            local_dir='../results',
+            local_dir=OUTPUT_DIR,
             name='output_cryo_exp_class_2d',
             scheduler=hyperband_sched,
             search_alg=hyperopt_search,
