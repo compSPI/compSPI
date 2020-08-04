@@ -10,16 +10,16 @@ import torch.nn as nn
 import torch.optim
 import torch.utils.data
 
-import geomstats
-from geomstats.geometry.euclidean_space import EuclideanSpace
-from geomstats.geometry.hyperbolic_space import HyperbolicSpace
-from geomstats.geometry.hypersphere import Hypersphere
+# import geomstats
+# from geomstats.geometry.euclidean_space import EuclideanSpace
+# from geomstats.geometry.hyperbolic_space import HyperbolicSpace
+# from geomstats.geometry.hypersphere import Hypersphere
 
-R2 = EuclideanSpace(dimension=2)
-H2 = HyperbolicSpace(dimension=2)
-S2 = Hypersphere(dimension=2)
+# R2 = EuclideanSpace(dimension=2)
+# H2 = HyperbolicSpace(dimension=2)
+# S2 = Hypersphere(dimension=2)
 
-MANIFOLD = {'r2': R2, 'h2': H2, 's2': S2}
+# MANIFOLD = {'r2': R2, 'h2': H2, 's2': S2}
 
 CUDA = torch.cuda.is_available()
 DEVICE = torch.device("cuda" if CUDA else "cpu")

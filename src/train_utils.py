@@ -8,7 +8,7 @@ import numpy as np
 import torch
 import torch.nn as tnn
 
-from geomstats.geometry.spd_matrices_space import SPDMatricesSpace
+# from geomstats.geometry.spd_matrices_space import SPDMatricesSpace
 
 import nn
 import toynn

@@ -6,6 +6,7 @@ import numpy as np
 import os
 import random
 import time
+from copy import deepcopy
 
 import ray
 
@@ -31,13 +32,15 @@ import train_utils
 import warnings
 warnings.filterwarnings("ignore")
 
+WITH_RAY = False
+
 SERVER_NAME = 'slacgpu'
 
 VISDOM = True if SERVER_NAME == 'gne' else False
 
 DEBUG = False
 
-DATASET_NAME = 'cryo_exp_3d'
+DATASET_NAME = 'cryo_exp_class_2d'
 
 # Hardware
 CUDA = torch.cuda.is_available()
@@ -112,10 +115,30 @@ if DEBUG:
 PRINT_INTERVAL = 10
 CKPT_PERIOD = 5
 
+class Config(object):
+    def __init__(self, search_space):
+        self.search_space = deepcopy(search_space)
+
+    def get(self, arg):
+        return self.search_space[arg]
 
 class Train(Trainable):
 
     def _setup(self, config):
+
+        if not WITH_RAY:
+            search_space = {
+                'dataset_name': 'cryo_exp_class_2d',
+                'class_2d': 39,
+                'lr': 0.005,
+                'latent_dim': 4,
+                'n_blocks': 6,
+                'lambda_regu': 0.2,
+                'lambda_adv': 0.2
+            }
+
+            config = Config(search_space)
+
         train_params = TRAIN_PARAMS
         train_params['lr'] = config.get('lr')
         train_params['lambda_regu'] = config.get(
@@ -243,8 +266,8 @@ class Train(Trainable):
                 # Autoencoding beyond pixels using a learned similarity metric
                 # arXiv:1512.09300v2
                 discriminator = self.modules['discriminator_reconstruction']
-                real_labels = torch.full((n_batch_data, 1), 1, device=DEVICE)
-                fake_labels = torch.full((n_batch_data, 1), 0, device=DEVICE)
+                real_labels = torch.full((n_batch_data, 1), 1, device=DEVICE, dtype=torch.float)
+                fake_labels = torch.full((n_batch_data, 1), 0, device=DEVICE, dtype=torch.float)
 
                 # -- Update DiscriminatorGan
                 labels_data, h_data, _ = discriminator(
@@ -684,60 +707,65 @@ def init():
 if __name__ == "__main__":
     init()
 
-    ray.init()
-    # ray.init(
-    #     address=os.environ['ip_head'],
-    #     redis_password=os.environ['redis_password'])
+    if WITH_RAY:
+        ray.init()
+        # ray.init(
+        #     address=os.environ['ip_head'],
+        #     redis_password=os.environ['redis_password'])
 
-    search_space = {
-        'dataset_name': 'cryo_exp_class_2d',
-        'class_2d': 39,
-        'lr': hp.loguniform(
-            'lr',
-            low=np.log(0.0001),
-            high=np.log(0.01)),
-        'latent_dim': hp.choice('latent_dim', [3, 4]),
-        'n_blocks': hp.choice('n_blocks', [5, 6]),
-        'lambda_regu': hp.loguniform(
-            'lambda_regu',
-            low=np.log(0.001), high=np.log(4.)),
-        'lambda_adv': hp.loguniform(
-            'lambda_adv',
-            low=np.log(0.001), high=np.log(4.)),
-    }
+        search_space = {
+            'dataset_name': 'cryo_exp_class_2d',
+            'class_2d': 39,
+            'lr': hp.loguniform(
+                'lr',
+                low=np.log(0.0001),
+                high=np.log(0.01)),
+            'latent_dim': hp.choice('latent_dim', [3, 4]),
+            'n_blocks': hp.choice('n_blocks', [5, 6]),
+            'lambda_regu': hp.loguniform(
+                'lambda_regu',
+                low=np.log(0.001), high=np.log(4.)),
+            'lambda_adv': hp.loguniform(
+                'lambda_adv',
+                low=np.log(0.001), high=np.log(4.)),
+        }
 
-    hyperband_sched = AsyncHyperBandScheduler(
-        time_attr='training_iteration',
-        metric='average_loss',
-        brackets=1,
-        reduction_factor=8,
-        mode='min')
+        hyperband_sched = AsyncHyperBandScheduler(
+            time_attr='training_iteration',
+            metric='average_loss',
+            brackets=1,
+            reduction_factor=8,
+            mode='min')
 
-    hyperopt_search = HyperOptSearch(
-        search_space,
-        metric='average_loss',
-        mode='min',
-        max_concurrent=257)
+        hyperopt_search = HyperOptSearch(
+            search_space,
+            metric='average_loss',
+            mode='min',
+            max_concurrent=257)
 
-    analysis = tune.run(
-        Train,
-        local_dir='/results',
-        name='output_cryo_exp_class_2d',
-        scheduler=hyperband_sched,
-        search_alg=hyperopt_search,
-        loggers=[JsonLogger, CSVLogger],
-        queue_trials=True,
-        reuse_actors=True,
-        **{
-            'stop': {
-                'training_iteration': N_EPOCHS,
-            },
-            'resources_per_trial': {
-                'cpu': 4,
-                'gpu': 1
-            },
-            'max_failures': 1,
-            'num_samples': 257,
-            'checkpoint_freq': CKPT_PERIOD,
-            'checkpoint_at_end': True,
-            'config': search_space})
+        analysis = tune.run(
+            Train,
+            local_dir='../results',
+            name='output_cryo_exp_class_2d',
+            scheduler=hyperband_sched,
+            search_alg=hyperopt_search,
+            loggers=[JsonLogger, CSVLogger],
+            queue_trials=True,
+            reuse_actors=True,
+            **{
+                'stop': {
+                    'training_iteration': N_EPOCHS,
+                },
+                'resources_per_trial': {
+                    'cpu': 1,
+                    'gpu': 0
+                },
+                'max_failures': 1,
+                'num_samples': 257,
+                'checkpoint_freq': CKPT_PERIOD,
+                'checkpoint_at_end': True,
+                'config': search_space})
+
+    else:
+        model = Train()
+        model._train_iteration()
