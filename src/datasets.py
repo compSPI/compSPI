@@ -27,8 +27,8 @@ import toynn
 CUDA = torch.cuda.is_available()
 KWARGS = {'num_workers': 1, 'pin_memory': True} if CUDA else {}
 
-CRYO_DIR = '../data/cryo'
-# CRYO_DIR = '/data/cryo'
+CRYO_DIR = '/data/cryo'
+# CRYO_DIR = '/Users/deebanramalingam/Dropbox/slac2/compSPI/data/cryo'
 # CRYO_DIR = '/afs/slac.stanford.edu/u/bd/nmiolane/gpfs_home/data/cryo'
 # CRYO_H5 = CRYO_DIR
 CRYO_H5 = os.path.join(

@@ -32,7 +32,10 @@ import train_utils
 import warnings
 warnings.filterwarnings("ignore")
 
-WITH_RAY = False
+OUTPUT_DIR = '/scratch/deebanr'
+#OUTPUT_DIR = '../results'
+
+WITH_RAY = True
 
 SERVER_NAME = 'slacgpu'
 
@@ -206,6 +209,7 @@ class Train(Trainable):
         eg. encoder, decoder, discriminator, depending on the architecture
         - optimizers: a dict with optimizers corresponding to each module.
         """
+        
         start = time.time()
 
         epoch = self._iteration
@@ -757,8 +761,8 @@ if __name__ == "__main__":
                     'training_iteration': N_EPOCHS,
                 },
                 'resources_per_trial': {
-                    'cpu': 1,
-                    'gpu': 0
+                    'cpu': 4,
+                    'gpu': 1
                 },
                 'max_failures': 1,
                 'num_samples': 257,
