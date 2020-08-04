@@ -15,9 +15,9 @@ import torch
 import torch.utils
 
 
-import geomstats
+# import geomstats
 
-from geomstats.geometry.spd_matrices_space import SPDMatricesSpace
+# from geomstats.geometry.spd_matrices_space import SPDMatricesSpace
 from skimage import transform
 from torchvision import datasets, transforms
 from urllib import request
@@ -27,7 +27,9 @@ import toynn
 CUDA = torch.cuda.is_available()
 KWARGS = {'num_workers': 1, 'pin_memory': True} if CUDA else {}
 
-CRYO_DIR = '/data/cryo'
+CRYO_DIR = '../data/cryo'
+# CRYO_DIR = '/data/cryo'
+# CRYO_DIR = '/Users/deebanramalingam/Dropbox/slac2/compSPI/data/cryo'
 # CRYO_DIR = '/afs/slac.stanford.edu/u/bd/nmiolane/gpfs_home/data/cryo'
 # CRYO_H5 = CRYO_DIR
 CRYO_H5 = os.path.join(

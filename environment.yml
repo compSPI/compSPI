@@ -1,0 +1,19 @@
+name: compspi-vaegan
+channels:
+  - conda-forge
+  - omnia
+  - defaults
+dependencies:
+  - python=3.7
+  - hyperopt
+  - pandas
+  - tabulate
+  - requests
+  - visdom
+  - h5py
+  - scikit-image
+  - pip
+  - pip:
+    - ray
+    - torch
+    - torchvision
