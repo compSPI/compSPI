@@ -32,8 +32,8 @@ import train_utils
 import warnings
 warnings.filterwarnings("ignore")
 
-OUTPUT_DIR = '/scratch/deebanr'
-#OUTPUT_DIR = '../results'
+# OUTPUT_DIR = '/scratch/deebanr'
+OUTPUT_DIR = '../results'
 
 WITH_RAY = True
 
