@@ -1,0 +1,11 @@
+# Misc
+.DS_store
+
+# Byte-compiled / optimized / DLL files
+src/__pycache__/*
+
+# Local output directory to store results of running VAEGAN code
+results/*
+
+# Local data directory that stores cryoem data
+data/*
