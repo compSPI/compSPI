@@ -40,9 +40,7 @@ CRYO_DIR = '/sdf/group/cryoem/g/ML/vaegan/'
 CRYO_H5 = os.path.join(
     '/gpfs/slac/cryo/fs1/g/ML/vaegan/datasets',
     'exp/20181005-rib-TEM4/Sort')
-NEURO_DIR = '/data/neuro'
 
-NEURO_TRAIN_VAL_DIR = os.path.join(NEURO_DIR, 'train_val_datasets')
 CRYO_TRAIN_VAL_DIR = os.path.join(CRYO_DIR, 'train_val_datasets')
 
 N_NODES = 28
@@ -58,13 +56,7 @@ FRAC_VAL = 0.05
 # get_loaders shuflles and transforms in tensors/loaders
 
 
-def get_datasets(dataset_name, frac_val=FRAC_VAL, batch_size=8,
-                 img_shape=None,
-                 nn_architecture=None,
-                 train_params=None,
-                 synthetic_params=None,
-                 class_2d=None,
-                 kwargs=KWARGS):
+def get_datasets(dataset_name, frac_val=FRAC_VAL, batch_size=8,img_shape=None,nn_architecture=None,train_params=None,synthetic_params=None,class_2d=None,kwargs=KWARGS):
 
     img_shape_no_channel = None
     if img_shape is not None:
@@ -128,8 +120,7 @@ def get_datasets(dataset_name, frac_val=FRAC_VAL, batch_size=8,
     return train_dataset, val_dataset
 
 
-def split_dataset(dataset, frac_val=FRAC_VAL,
-                  labels_path=None, save=False, data_dir=None):
+def split_dataset(dataset, frac_val=FRAC_VAL,labels_path=None, save=False, data_dir=None):
     length = len(dataset)
     train_length = int((1 - frac_val) * length)
     train_dataset = dataset[:train_length]
@@ -254,295 +245,6 @@ def get_dataset_mnist(img_shape_no_channel=(28, 28)):
     return train_dataset, val_dataset
 
 
-def get_dataset_connectomes(img_shape_no_channel=(100, 100)):
-    """
-    Connectomes from HCP 1200:
-    https://www.humanconnectome.org/storage/app/media/
-    documentation/s1200/HCP_S1200_Release_Reference_Manual.pdf
-    """
-    shape_str = get_shape_string(img_shape_no_channel)
-    train_path = os.path.join(
-        NEURO_TRAIN_VAL_DIR, 'train_conn_%s.npy' % shape_str)
-    val_path = os.path.join(
-        NEURO_TRAIN_VAL_DIR, 'val_conn_%s.npy' % shape_str)
-
-    hcp_labels_path = os.path.join(
-        NEURO_TRAIN_VAL_DIR,
-        'hcp_labels.csv')
-
-    train_exists = os.path.isfile(train_path)
-    val_exists = os.path.isfile(val_path)
-    if train_exists and val_exists:
-        print('Loading %s...' % train_path)
-        print('Loading %s...' % val_path)
-        train_dataset = np.load(train_path)
-        val_dataset = np.load(val_path)
-
-    else:
-        hcp_meta = pd.read_csv(
-            '/neuro/HCP_PTN1200_recon2/hcp_metadata.csv')
-
-        n_nodes = img_shape_no_channel[0]
-        hcp_dir = os.path.join(
-            NEURO_DIR, 'HCP_PTN1200_recon2')
-        ts_dir = os.path.join(
-                hcp_dir, 'node_timeseries/3T_HCP1200_MSMAll_d%d_ts2' % n_nodes)
-        string_base = '%s/*.txt' % ts_dir
-
-        all_paths = glob.glob(string_base)
-        print('Found %d paths.' % len(all_paths))
-
-        all_ts = []
-        all_subject_ids = []
-        all_genders = []
-        all_ages = []
-        for i, path in enumerate(all_paths):
-            print('Extracting time series %s...' % path)
-            ts = np.loadtxt(path)
-            all_ts.append(ts)
-            basename = os.path.basename(path)
-            subject_id = basename.split('.')[0]
-            print('subject id: %s' % subject_id)
-            subject_id = int(subject_id)
-            all_subject_ids.append(subject_id)
-
-            hcp_meta_row = hcp_meta[hcp_meta['Subject'] == subject_id]
-
-            gender = hcp_meta_row['Gender'].values[0]
-            print(gender)
-            age = hcp_meta_row['Age'].values[0]
-            print(age)
-            all_genders.append(gender)
-            all_ages.append(age)
-        all_ts = np.array(all_ts)
-
-        n_data = all_ts.shape[0]
-        print('Found %d data.' % n_data)
-        all_connectomes = np.zeros((n_data, n_nodes, n_nodes))
-
-        for i_ts in range(n_data):
-            for i_node in range(n_nodes):
-                for j_node in np.arange(i_node,  n_nodes, 1):
-                    ts_of_node_i = all_ts[i_ts, :, i_node]
-                    ts_of_node_j = all_ts[i_ts, :, j_node]
-                    x = np.vstack([ts_of_node_i, ts_of_node_j])
-                    corr = np.corrcoef(x)[0, 1]
-                    all_connectomes[i_ts, i_node, j_node] = corr
-                    all_connectomes[i_ts, j_node, i_node] = corr
-
-        dataset = all_connectomes
-        dataset = add_channels(dataset, img_dim=2)
-        assert len(dataset.shape) == 4
-        print('Dataset of shape:')
-        print(dataset.shape)
-        train_dataset, val_dataset = split_dataset(dataset)
-        print('Saving %s...' % train_path)
-        print('Saving %s...' % val_path)
-        np.save(train_path, train_dataset)
-        np.save(val_path, val_dataset)
-
-        with open(hcp_labels_path, 'w') as csv_file:
-            writer = csv.writer(csv_file)
-            writer.writerow(['Subject', 'Gender', 'Age'])
-            for subject_id, gender, age in zip(
-                    all_subject_ids, all_genders, all_ages):
-                writer.writerow([subject_id, gender, age])
-
-    return train_dataset, val_dataset
-
-
-def get_dataset_connectomes_from_netmats(img_shape_no_channel=(100, 100),
-                                         partial_corr=True):
-    """
-    Connectomes from HCP 1200:
-    https://www.humanconnectome.org/storage/app/media/
-    documentation/s1200/HCP_S1200_Release_Reference_Manual.pdf
-    """
-    netmat_type = int(partial_corr) + 1
-
-    shape_str = get_shape_string(img_shape_no_channel)
-    train_path = os.path.join(
-        NEURO_TRAIN_VAL_DIR, 'train_conn_%s.npy' % shape_str)
-    val_path = os.path.join(
-        NEURO_TRAIN_VAL_DIR, 'val_conn_%s.npy' % shape_str)
-
-    train_exists = os.path.isfile(train_path)
-    val_exists = os.path.isfile(val_path)
-    if train_exists and val_exists:
-        print('Loading %s...' % train_path)
-        print('Loading %s...' % val_path)
-        train_dataset = np.load(train_path)
-        val_dataset = np.load(val_path)
-
-    else:
-        n_nodes = img_shape_no_channel[0]
-        hcp_dir = os.path.join(
-            NEURO_DIR, 'HCP_PTN1200_recon2')
-        netmats_path = os.path.join(
-            hcp_dir, 'netmats/3T_HCP1200_MSMAll_d%d_ts2/netmats%d.txt' % (
-                n_nodes, netmat_type))
-        print('Loading %s...' % netmats_path)
-        netmats = np.loadtxt(netmats_path)
-        netmats = netmats.reshape(-1, n_nodes, n_nodes)
-        n_mats, _, _ = netmats.shape
-
-        r_mats = r_pearson_from_z_score(netmats)
-
-        # HACK
-        r_mats = 1 / 4 * (r_mats + ID_COEF * np.tile(
-            np.eye(n_nodes, n_nodes), (n_mats, 1, 1)))
-        r_mats = np.abs(r_mats)
-
-        r_mats = add_channels(r_mats, img_dim=2)
-
-        dataset = r_mats
-
-        assert len(dataset.shape) == 4
-
-        # dataset = normalization_linear(dataset)
-
-        train_dataset, val_dataset = split_dataset(dataset)
-        print('Saving %s...' % train_path)
-        print('Saving %s...' % val_path)
-        np.save(train_path, train_dataset)
-        np.save(val_path, val_dataset)
-
-    return train_dataset, val_dataset
-
-
-def get_dataset_connectomes_simu(img_shape_no_channel=(15, 15)):
-    """
-    Simulating a geodesic triangle.
-    """
-    shape_str = get_shape_string(img_shape_no_channel)
-    train_path = os.path.join(
-        NEURO_TRAIN_VAL_DIR, 'train_conn_simu_%s.npy' % shape_str)
-    val_path = os.path.join(
-        NEURO_TRAIN_VAL_DIR, 'val_conn_simu_%s.npy' % shape_str)
-
-    train_exists = os.path.isfile(train_path)
-    val_exists = os.path.isfile(val_path)
-    if train_exists and val_exists:
-        print('Loading %s...' % train_path)
-        print('Loading %s...' % val_path)
-        train_dataset = np.load(train_path)
-        val_dataset = np.load(val_path)
-
-    else:
-        n, _ = img_shape_no_channel
-        os.environ['GEOMSTATS_BACKEND'] = 'numpy'
-        spd_space = SPDMatricesSpace(n=n)
-        vec_dim = int(n * (n + 1) / 2)
-        vec_a = np.zeros(vec_dim)
-        vec_b = np.zeros(vec_dim)
-        vec_c = np.zeros(vec_dim)
-
-        cos_angle = np.cos(np.pi / 3)
-        sin_angle = np.cos(np.pi / 3)
-        vec_a[0] = cos_angle
-        vec_a[1] = sin_angle
-        vec_b[0] = -cos_angle
-        vec_b[1] = sin_angle
-        vec_c[0] = 0.
-        vec_c[1] = -1.
-
-        # mat_identity = np.eye(n)
-        # sym_mat_a = spd_space.symmetric_matrix_from_vector(vec_a)
-        # spd_mat_a = spd_space.metric.exp(
-        #     base_point=mat_identity, tangent_vec=sym_mat_a)
-        # sym_mat_b = spd_space.symmetric_matrix_from_vector(vec_b)
-        # spd_mat_b = spd_space.metric.exp(
-        #     base_point=mat_identity, tangent_vec=sym_mat_b)
-        # sym_mat_c = spd_space.symmetric_matrix_from_vector(vec_c)
-        # spd_mat_c = spd_space.metric.exp(
-        #     base_point=mat_identity, tangent_vec=sym_mat_c)
-
-        spd_mat_a = np.eye(n)  # spd_space.random_uniform()
-        spd_mat_b = spd_space.random_uniform()
-        spd_mat_c = spd_space.random_uniform()
-        assert is_spd(spd_mat_a)
-        assert is_spd(spd_mat_b)
-        assert is_spd(spd_mat_c)
-
-        vec_ab = spd_space.metric.log(base_point=spd_mat_a, point=spd_mat_b)
-        geod_ab = spd_space.metric.geodesic(
-            initial_point=spd_mat_a, initial_tangent_vec=vec_ab)
-        points_ab = geod_ab(np.arange(0, 1, 0.0002))
-        assert is_spd(points_ab)
-
-        vec_bc = spd_space.metric.log(base_point=spd_mat_b, point=spd_mat_c)
-        geod_bc = spd_space.metric.geodesic(
-            initial_point=spd_mat_b, initial_tangent_vec=vec_bc)
-        points_bc = geod_bc(np.arange(0, 1, 0.0002))
-        assert is_spd(points_bc)
-
-        vec_ca = spd_space.metric.log(base_point=spd_mat_c, point=spd_mat_a)
-        geod_ca = spd_space.metric.geodesic(
-            initial_point=spd_mat_c, initial_tangent_vec=vec_ca)
-        points_ca = geod_ca(np.arange(0, 1, 0.0002))
-        assert is_spd(points_ca)
-        os.environ['GEOMSTATS_BACKEND'] = 'pytorch'
-
-        dataset = np.concatenate([points_ab, points_bc, points_ca], axis=0)
-        assert is_spd(dataset)
-        # assert np.all(spd_space.belongs(dataset))
-        np.random.shuffle(dataset)
-
-        dataset = add_channels(dataset, img_dim=2)
-        assert len(dataset.shape) == 4
-
-        # dataset = normalization_linear(dataset)
-
-        train_dataset, val_dataset = split_dataset(dataset)
-        print('Saving %s...' % train_path)
-        print('Saving %s...' % val_path)
-        np.save(train_path, train_dataset)
-        np.save(val_path, val_dataset)
-
-    return train_dataset, val_dataset
-
-
-def get_dataset_connectomes_schizophrenia():
-    """
-    Connectomes are SPD matrices of size N_NODESxN_NODES.
-    """
-    graphs = pd.read_csv('/neuro/connectomes/train_fnc.csv')
-    map_functional = pd.read_csv(
-        '/neuro/connectomes/comp_ind_fmri.csv', index_col=None)
-    map_functional = map_functional['fMRI_comp_ind'].to_dict()
-    map_functional_r = {v: k for k, v
-                        in map_functional.items()}
-    mapping = pd.read_csv(
-        '/neuro/connectomes/rs_fmri_fnc_mapping.csv')
-    graph_labels = pd.read_csv('/neuro/connectomes/train_labels.csv')
-    all_graphs = [None] * N_GRAPHS
-    all_labels = np.zeros(N_GRAPHS)
-
-    def create_connectome(graph_id, mapping):
-        u = np.zeros((N_NODES, N_NODES))
-        nb_edges = mapping.shape[0]
-        for edge in range(nb_edges):
-            e0, e1 = (mapping.iloc[edge]['mapA'], mapping.iloc[edge]['mapB'])
-            region0, region1 = map_functional_r[e0], map_functional_r[e1]
-            corr = graphs.iloc[graph_id][edge+1]
-            u[region0, region1] = corr
-        u = np.multiply(u, (np.abs(u) > CORR_THRESH))
-        return np.abs(u + u.T)
-
-    for graph_id in range(N_GRAPHS):
-        all_graphs[graph_id] = create_connectome(graph_id, mapping)
-        all_labels[graph_id] = int(
-            graph_labels.loc[graphs.index[graph_id], 'Class'])
-
-    all_labels = np.array(all_labels)
-    all_graphs = np.array(all_graphs)
-    train_dataset, val_dataset = split_dataset(all_graphs)
-    train_dataset = torch.Tensor(train_dataset)
-    val_dataset = torch.Tensor(val_dataset)
-
-    return train_dataset, val_dataset, all_labels
-
-
 def get_dataset_cryo_sphere(img_shape_no_channel=None, kwargs=KWARGS):
     shape_str = get_shape_string(img_shape_no_channel)
     cryo_path = os.path.join(
@@ -592,8 +294,7 @@ def recursively_load_dict_contents_from_group(h5file, path):
     return ans
 
 
-def get_dataset_cryo(
-        dataset_name, img_shape_no_channel=None, kwargs=KWARGS):
+def get_dataset_cryo(dataset_name, img_shape_no_channel=None, kwargs=KWARGS):
     shape_str = get_shape_string(img_shape_no_channel)
     cryo_img_path = os.path.join(
         CRYO_TRAIN_VAL_DIR,
@@ -707,8 +408,7 @@ def get_dataset_cryo_exp(img_shape_no_channel=None, kwargs=KWARGS):
     return dataset
 
 
-def get_dataset_cryo_exp_class_2d(img_shape_no_channel=None,
-                                  class_2d=None, kwargs=KWARGS):
+def get_dataset_cryo_exp_class_2d(img_shape_no_channel=None,class_2d=None, kwargs=KWARGS):
     CRYO_TRAIN_VAL_DIR = os.path.join(CRYO_DIR, 'train_val_datasets')
     shape_str = get_shape_string(img_shape_no_channel)
     cryo_img_path = os.path.join(
@@ -788,34 +488,7 @@ def get_dataset_cryo_exp_3d(img_shape_no_channel=None, kwargs=KWARGS):
     return dataset
 
 
-def get_loaders_brain(dataset_name, frac_val, batch_size,
-                      img_shape, kwargs=KWARGS):
-
-    shape_str = get_shape_string(img_shape)
-    NEURO_TRAIN_VAL_DIR = os.path.join(NEURO_DIR, 'train_val_datasets')
-    train_path = os.path.join(
-        NEURO_TRAIN_VAL_DIR, 'train_%s_%s.npy' % (dataset_name, shape_str))
-    val_path = os.path.join(
-        NEURO_TRAIN_VAL_DIR, 'val_%s_%s.npy' % (dataset_name, shape_str))
-
-    train = torch.Tensor(np.load(train_path))
-    val = torch.Tensor(np.load(val_path))
-
-    logging.info('-- Train tensor: (%d, %d, %d, %d)' % train.shape)
-    train_dataset = torch.utils.data.TensorDataset(train)
-    train_loader = torch.utils.data.DataLoader(
-        train_dataset, batch_size=batch_size, shuffle=True, **kwargs)
-
-    logging.info('-- Val tensor: (%d, %d, %d, %d)' % val.shape)
-    val_dataset = torch.utils.data.TensorDataset(val)
-    val_loader = torch.utils.data.DataLoader(
-        val_dataset, batch_size=batch_size, shuffle=True, **kwargs)
-    return train_loader, val_loader
-
-
-def make_synthetic_dataset_and_decoder(synthetic_params,
-                                       nn_architecture,
-                                       train_params):
+def make_synthetic_dataset_and_decoder(synthetic_params,nn_architecture,train_params):
     """
     Generate synthetic dataset from a "true" decoder.
 

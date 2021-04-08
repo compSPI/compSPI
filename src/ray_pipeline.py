@@ -67,9 +67,7 @@ IMG_SHAPE = (1, 128, 128)
 DATA_DIM = functools.reduce((lambda x, y: x * y), IMG_SHAPE)
 LATENT_DIM = 3
 NN_TYPE = 'conv_orig'
-SPD = False
 assert NN_TYPE in ['toy', 'fc', 'conv', 'conv_plus', 'conv_orig']
-assert NN_TYPE == 'fc' if SPD else True
 
 NN_ARCHITECTURE = {
     'img_shape': IMG_SHAPE,
@@ -83,7 +81,6 @@ NN_ARCHITECTURE = {
 
 BATCH_SIZES = {15: 128, 25: 64, 64: 32, 90: 32, 96: 32, 100: 8, 128: 8}
 BATCH_SIZE = BATCH_SIZES[IMG_SHAPE[1]]
-FRAC_TEST = 0.1
 FRAC_VAL = 0.2
 N_SES_DEBUG = 3
 
