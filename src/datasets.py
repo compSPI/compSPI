@@ -41,9 +41,7 @@ CRYO_H5 = os.path.join(
     '/gpfs/slac/cryo/fs1/g/ML/vaegan/datasets',
     'exp/20181005-rib-TEM4/Sort')
 
-CRYO_TRAIN_VAL_DIR = os.path.join(CRYO_DIR, 'train_val_datasets')
 
-N_NODES = 28
 CORR_THRESH = 0.1
 GAMMA = 1.0
 N_GRAPHS = 86
@@ -488,80 +486,3 @@ def get_dataset_cryo_exp_3d(img_shape_no_channel=None, kwargs=KWARGS):
     return dataset
 
 
-def make_synthetic_dataset_and_decoder(synthetic_params,nn_architecture,train_params):
-    """
-    Generate synthetic dataset from a "true" decoder.
-
-    The dataset is different depending on the
-    vae/other submanifold learning method
-    that will be used.
-
-    - vae_type == 'gvae' or == 'gvae_tgt'
-        - data generated on tangent space at base_point
-        - data shot on the manifold
-        - riemannian noise on the manifold
-        - data log-projected on tangent space at base_point
-        - data in 2D on the tangent space
-    - vae_type == 'vae':
-        - data generated on tangent space at base_point
-        - data shot on the manifold
-        - riemannian noise on the manifold
-        - data in 3D in the ambient space
-    """
-    # TODO(nina): Unfair comparison: vae learning is not like gen model
-    synthetic_dir = synthetic_params['dir']
-    synthetic_data_path = os.path.join(synthetic_dir, 'dataset.npy')
-    decoder_true_path = os.path.join(synthetic_dir, 'decoder_true.pth')
-
-    synthetic_data_exists = os.path.isfile(synthetic_data_path)
-    decoder_exists = os.path.isfile(decoder_true_path)
-
-    if synthetic_data_exists and decoder_exists:
-        dataset = np.load(synthetic_data_path)
-    else:
-        n_samples = synthetic_params['n']
-
-        manifold_name = synthetic_params['manifold_name']
-        vae_type = train_params['vae_type']
-        logvarx_true = synthetic_params['logvarx_true']
-
-        os.environ['GEOMSTATS_BACKEND'] = 'numpy'
-        importlib.reload(geomstats.backend)
-
-        logging.info('NN architecture:')
-        logging.info(nn_architecture)
-
-        logging.info('Synthetic params:')
-        logging.info(synthetic_params)
-
-        decoder_true = toynn.make_decoder_true(
-            synthetic_params, nn_architecture)
-
-        if manifold_name == 'r2':
-            dataset = toynn.generate_from_decoder_fixed_var(
-                decoder=decoder_true,
-                logvarx=logvarx_true,
-                n_samples=n_samples)
-
-        elif manifold_name == 's2' or manifold_name == 'h2':
-            if vae_type == 'gvae_tgt':
-                dataset = toynn.generate_from_decoder_fixed_var_tgt(
-                    decoder_true,
-                    logvarx=logvarx_true,
-                    n_samples=n_samples,
-                    manifold_name=manifold_name)
-            elif vae_type == 'vae':
-                dataset = toynn.generate_from_decoder_fixed_var_riem(
-                    decoder_true,
-                    logvarx=logvarx_true,
-                    n_samples=n_samples,
-                    manifold_name=manifold_name)
-            else:
-                raise ValueError(vae_type)
-
-        else:
-            raise ValueError(manifold_name)
-
-        np.save(synthetic_data_path, dataset)
-        torch.save(decoder_true, decoder_true_path)
-    return dataset
