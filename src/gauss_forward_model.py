@@ -91,7 +91,7 @@ def precompute_idx_ntrunc_rot_gpu(Rs,xy,N,atoms,idx,n_trunc,sigma,g_2d):
 
       X = round(x_rot) + N[i]//2
       Y = round(y_rot) + N[i]//2
-      idx[i] = X+N[i]*Y
+      idx[i] = X+N[i]*Y # this has to match with xy (vs yx). check xy[[0,1],:] = xy[[1,0],:] if problems
 
       for x_idx in range(idx[i]-nt_,idx[i]+nt_+1,1): 
         for y_idx in range(-nt_,+nt_+1,1):
