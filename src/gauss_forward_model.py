@@ -103,10 +103,10 @@ def precompute_idx_ntrunc_rot_gpu(Rs,xy,N,atoms,idx,n_trunc,sigma,g_2d):
           g_2d[proj_idx,xy_idx] += gi # TODO double check no racing condition.
 
 def make_proj_gpu(atoms,xy,N,n_proj,sigma,n_trunc=None,Rs=None,method='precompute_idx_ntrunc_rot_gpu',random_seed=0):
-'''
-rotate point cloud and project onto 2D grid assumig gaussians
-initialization of g_2d and copy steps onto GPU are bottleneck. actual computation of g_2d_gpu stays ms for 1-100k rotations on 128^2 grid and 10-100k atoms. hit memory issues
-'''
+  '''
+  rotate point cloud and project onto 2D grid assumig gaussians
+  initialization of g_2d and copy steps onto GPU are bottleneck. actual computation of g_2d_gpu stays ms for 1-100k rotations on 128^2 grid and 10-100k atoms. hit memory issues
+  '''
   
   g_2d = np.zeros((n_proj,N*N),dtype=np.float64) # TODO: try to initialize this large array of zeros on host
   if n_trunc is None: n_trunc = np.int64(6*sigma)
