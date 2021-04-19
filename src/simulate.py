@@ -80,7 +80,6 @@ def simulate_slice(map_r,psize,n_particles,N_crop,snr,do_snr=True,
     if do_ctf:
         d.update({'df1_A':df1s,'df2_A':df2s,'df_ang_deg':df_ang_deg,'kev':kv,'ac':ac,'cs_mm':cs
             })
-
     meta_data_df = pd.DataFrame(d)
 
     return(proj_r,proj_r_noise,meta_data_df)
@@ -120,7 +119,7 @@ def simulate_atoms(atoms,N,psize,n_particles,
     # CTF
     # to avoid CTF aliasing, ensure N is large
     if do_ctf:
-        projs_f = fourier.do_fft(projs,d=2,batch=True) # TODO: may need to zero pad here for CTF
+        projs_f = fourier.do_fft(projs_r,d=2,batch=True) # TODO: may need to zero pad here for CTF
         CTFs, df1s, df2s, df_ang_deg = transfer.random_ctfs(N=N,
                                   psize=psize,
                                   n_particles=n_particles,
