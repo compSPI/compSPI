@@ -23,7 +23,7 @@ def make_map_3d(atoms,xyz,N,sigma):
 # copy data over in rotation matrix, or as quaternions for compresion and then compute 3x3 R on the fly
 # how big does patch need to be? 3 sigma overkill?
 @nb.guvectorize([(nb.float64[:,:,:],nb.float64[:,:],nb.int64[:],nb.float64[:,:],nb.int64[:],nb.int64[:],nb.float64[:],nb.float64[:,:])], 
-  '(r2,r3,n_proj),(N2,r2),(n_atoms),(r3,n_atoms),(n_atoms),(n_atoms),(n_atoms)->(n_proj,N2)',
+  '(n_proj,r2,r3),(N2,r2),(n_atoms),(r3,n_atoms),(n_atoms),(n_atoms),(n_atoms)->(n_proj,N2)',
   nopython=True,target='cuda')
 def precompute_idx_ntrunc_rot_gpu(Rs,xy,N,atoms,idx,n_trunc,sigma,g_2d):
   '''
