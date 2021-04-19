@@ -4,6 +4,8 @@ import numba as nb
 import math
 import coords
 
+
+
 def make_gauss_2d(xv,yv,mu,sigma):
   g = np.exp(-( (xv-mu[0])**2 + (yv-mu[1])**2)  /(2*sigma**2) )
   return(g)
@@ -14,52 +16,6 @@ def make_map_3d(atoms,xyz,N,sigma):
   a = -1/(2*sigma**2)
   map_3d = (C**3*np.exp(a*((diff**2).sum(1))).sum(1).reshape(N,N,N))
   return(map_3d)
-
-@njit(parallel=True)
-def parallel_add_patch_including_diff(xy,N,atoms,idx,n_trunc,sigma):
-  nt_ = (n_trunc-1)//2
-  a = -1/(2*sigma**2)
-  g_2d = np.zeros(N*N)
-  for i in prange(idx.shape[0]): # loop over atoms
-    patch_line = np.arange(idx[i]-nt_,idx[i]+nt_+1,1)
-    for y_line in prange(-nt_,+nt_+1,1):
-      one_gauss_patch_y_line_idxs = patch_line + y_line*N
-
-      diffx = xy[one_gauss_patch_y_line_idxs,0] - atoms[0,i]
-      diffy = xy[one_gauss_patch_y_line_idxs[0],1] - atoms[1,i] # all ys the same
-      d2i = diffx*diffx+diffy*diffy
-      gi_y_line = np.exp(a*d2i)
-      g_2d[one_gauss_patch_y_line_idxs] += gi_y_line
-
-  return(g_2d)
-
-@njit(parallel=True)
-def parallel_add_patch_from_idx(idx,d2,N,n_trunc,sigma):
-  # https://numba.pydata.org/numba-doc/latest/user/parallel.html njit and prange with +=
-  nt_ = (n_trunc-1)//2
-  a = -1/(2*sigma**2)
-  g_2d = np.zeros(N*N)
-  for i in prange(idx.shape[0]): # loop over atoms
-    patch_line = np.arange(idx[i]-nt_,idx[i]+nt_+1,1)
-    for y_line in prange(-nt_,+nt_+1,1):
-      one_gauss_patch_y_line_idxs = patch_line + y_line*N
-      gi_y_line = np.exp(a*d2[one_gauss_patch_y_line_idxs,i])
-      g_2d[one_gauss_patch_y_line_idxs] += gi_y_line
-
-  return(g_2d)
-
-def make_proj_mask(atoms, xy, sigma, n_trunc,parallel_diff=True):
-  N = np.sqrt(xy.shape[0]).astype(int)
-  X = np.round(atoms[0]).astype(np.int32) + N//2
-  Y = np.round(atoms[1]).astype(np.int32) + N//2
-  idx = X+N*Y
-  if parallel_diff:
-    g_2d = parallel_add_patch_including_diff(xy,N,atoms,idx,n_trunc,sigma).reshape(N,N)
-  else:
-    diff = xy.reshape(-1,2,1) - atoms[:2,:].reshape(1,2,-1) # proj indep of z
-    d2 = (diff**2).sum(axis=1)
-    g_2d = parallel_add_patch_from_idx(idx,d2,N,n_trunc,sigma).reshape(N,N)
-  return(g_2d)
 
 # TODO: see if faster to copy over scalar vs vectorized scalar
 # float32 vs 64
@@ -74,8 +30,8 @@ def precompute_idx_ntrunc_rot_gpu(Rs,xy,N,atoms,idx,n_trunc,sigma,g_2d):
   '''
 
   '''
-  for proj_idx in range(Rs.shape[-1]):
-    R = Rs[:,:,proj_idx]
+  for proj_idx in range(Rs.shape[0]):
+    R = Rs[proj_idx,:,:]
 
     for i in range(idx.shape[0]): # loop over atoms
       nt_ = (n_trunc[i]-1)//2
@@ -112,15 +68,16 @@ def make_proj_gpu(atoms,xy,N,n_proj,sigma,n_trunc=None,Rs=None,method='precomput
   if n_trunc is None: n_trunc = np.int64(6*sigma)
   
   if Rs is not None:
-    np.random.seed(random_seed)
+    if random_seed is not None: np.random.seed(random_seed)
     qs = coords.get_random_quat(n_proj)
+    Rs = coords.SO3.matrix_from_quaternion() # n_proj,3,3
     Rs = coords.quaternion_to_R(qs.T)
 
-  assert Rs.shape == (3,3,n_proj)
+  assert Rs.shape == (n_proj,3,3)
 
   # copy data to gpu
   # TODO: see if faster to copy over single scalar (N,n_trunc,sigma) vs vectorized scalar
-  Rs_gpu = nb.cuda.to_device(Rs[:2,:,:]) # only need x and y part since will ignore final rotated z coordinate
+  Rs_gpu = nb.cuda.to_device(Rs[:,:2,:]) # only need x and y part since will ignore final rotated z coordinate
   N_gpu = nb.cuda.to_device(N*np.ones(atoms.shape[1]).astype(np.int64))
   n_trunc_gpu = nb.cuda.to_device(n_trunc*np.ones(atoms.shape[1]).astype(np.int64))
   sigma_gpu = nb.cuda.to_device(sigma*np.ones(atoms.shape[1]).astype(np.float64))

@@ -13,6 +13,7 @@ dependencies:
   - h5py
   - scikit-image
   - pip
+  - pyfftw==0.12.0
   - pip:
     - ray
     - torch
