@@ -69,9 +69,7 @@ def make_proj_gpu(atoms,xy,N,n_proj,sigma,n_trunc=None,Rs=None,method='precomput
   
   if Rs is not None:
     if random_seed is not None: np.random.seed(random_seed)
-    qs = coords.get_random_quat(n_proj)
-    Rs = coords.SO3.matrix_from_quaternion() # n_proj,3,3
-    Rs = coords.quaternion_to_R(qs.T)
+    Rs = coords.uniform_rotations(n_proj)
 
   assert Rs.shape == (n_proj,3,3)
 
