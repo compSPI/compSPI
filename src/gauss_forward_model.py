@@ -72,9 +72,9 @@ def make_proj_gpu(atoms,xy,N,n_proj,sigma,n_trunc=None,Rs=None,method='precomput
   g_2d = np.zeros((n_proj,N*N),dtype=np.float64) # TODO: try to initialize this large array of zeros on host
   if n_trunc is None: n_trunc = np.int64(6*sigma)
   
-  if Rs is not None:
+  if Rs is None:
     if random_seed is not None: np.random.seed(random_seed)
-    Rs = coords.uniform_rotations(n_proj)
+    Rs,qs = coords.uniform_rotations(n_proj)
 
   assert Rs.shape == (n_proj,3,3)
 
