@@ -1,4 +1,4 @@
-import coords, fourier, transfer
+import coords, fourier, transfer, gauss_forward_model
 import numpy as np
 import pandas as pd
 from scipy.ndimage import map_coordinates
