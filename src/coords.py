@@ -2,7 +2,6 @@ import numpy as np
 from geomstats.geometry.special_orthogonal import SpecialOrthogonal
 SO3 = SpecialOrthogonal(n=3, point_type='vector')
 
-
 def coords_n_by_d(coords_1d=None,N=None,d=3):
   if coords_1d is not None and N is None: 
     pass
@@ -41,3 +40,8 @@ def get_random_quat(num_pts):
     quat[3] = np.sqrt(u1) * np.cos(np.pi * u3 / 2)
 
     return np.transpose(quat)
+
+def uniform_Rs(num):
+  qs = coords.get_random_quat(num)
+  Rs = coords.SO3.matrix_from_quaternion() # num,3,3
+  return(Rs)
