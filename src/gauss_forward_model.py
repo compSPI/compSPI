@@ -57,6 +57,12 @@ def precompute_idx_ntrunc_rot_gpu(Rs,xy,N,atoms,idx,n_trunc,sigma,g_2d):
           gi = math.exp(a*d2i)
           g_2d[proj_idx,xy_idx] += gi # TODO double check no racing condition.
 
+def idx_from_atoms(atoms,N):
+  X = np.round(atoms[0]).astype(np.int32) + N//2
+  Y = np.round(atoms[1]).astype(np.int32) + N//2
+  idx = X+N*Y
+  return(idx)
+
 def make_proj_gpu(atoms,xy,N,n_proj,sigma,n_trunc=None,Rs=None,method='precompute_idx_ntrunc_rot_gpu',random_seed=0):
   '''
   rotate point cloud and project onto 2D grid assumig gaussians
@@ -71,6 +77,8 @@ def make_proj_gpu(atoms,xy,N,n_proj,sigma,n_trunc=None,Rs=None,method='precomput
     Rs = coords.uniform_rotations(n_proj)
 
   assert Rs.shape == (n_proj,3,3)
+
+  idx = idx_from_atoms(atoms,N)
 
   # copy data to gpu
   # TODO: see if faster to copy over single scalar (N,n_trunc,sigma) vs vectorized scalar
