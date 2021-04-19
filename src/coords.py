@@ -41,7 +41,7 @@ def get_random_quat(num_pts):
 
     return np.transpose(quat)
 
-def uniform_Rs(num):
+def uniform_rotations(num):
   qs = coords.get_random_quat(num)
   Rs = coords.SO3.matrix_from_quaternion() # num,3,3
   return(Rs)
