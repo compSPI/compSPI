@@ -82,7 +82,7 @@ def make_proj_gpu(atoms,xy,N,n_proj,sigma,n_trunc=None,Rs=None,method='precomput
 
   # copy data to gpu
   # TODO: see if faster to copy over single scalar (N,n_trunc,sigma) vs vectorized scalar
-  Rs_gpu = nb.cuda.to_device(Rs[:,:2,:].copy()) # only need x and y part since will ignore final rotated z coordinate
+  Rs_gpu = nb.cuda.to_device(np.ascontiguousarray(Rs[:,:2,:])) # only need x and y part since will ignore final rotated z coordinate
     # have to .copy because can only pass in subset on first axis, otherwise error that non-contiguous
   N_gpu = nb.cuda.to_device(N*np.ones(atoms.shape[1]).astype(np.int64))
   n_trunc_gpu = nb.cuda.to_device(n_trunc*np.ones(atoms.shape[1]).astype(np.int64))
