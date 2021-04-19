@@ -75,9 +75,13 @@ def simulate_slice(map_r,psize,n_particles,N_crop,snr,do_snr=True,
     else:
         proj_r_noise = proj_r
 
-    meta_data_df = pd.DataFrame({'N':N_crop,'psize':psize_crop,'snr':snr,'df1_A':df1s,'df2_A':df2s,'df_ang_deg':df_ang_deg,'kev':kv,'ac':ac,'cs_mm':cs,
-              'rotation_quaternion':[np.array2string(q) for q in qs]
+    d = {'N':N_crop,'psize':psize_crop,'snr':snr,
+        'rotation_quaternion':[np.array2string(q) for q in qs]}
+    if do_ctf:
+        d.update({'df1_A':df1s,'df2_A':df2s,'df_ang_deg':df_ang_deg,'kev':kv,'ac':ac,'cs_mm':cs
             })
+
+    meta_data_df = pd.DataFrame(d)
 
     return(proj_r,proj_r_noise,meta_data_df)
 
@@ -144,8 +148,11 @@ def simulate_atoms(atoms,N,psize,n_particles,
     else:
         projs_r_noise = projs_r
 
-    meta_data_df = pd.DataFrame({'N':N,'psize':psize,'snr':snr,'df1_A':df1s,'df2_A':df2s,'df_ang_deg':df_ang_deg,'kev':kv,'ac':ac,'cs_mm':cs,
-              'rotation_quaternion':[np.array2string(q) for q in qs]
+    d = {'N':N,'psize':psize,'snr':snr,
+        'rotation_quaternion':[np.array2string(q) for q in qs]}
+    if do_ctf:
+        d.update({'df1_A':df1s,'df2_A':df2s,'df_ang_deg':df_ang_deg,'kev':kv,'ac':ac,'cs_mm':cs
             })
+    meta_data_df = pd.DataFrame(d)
 
     return(projs_r,projs_r_noise,meta_data_df)
