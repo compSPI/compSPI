@@ -1,7 +1,6 @@
-import pyfftw
 import numpy as np
-import pyfftw.interfaces.numpy_fft
 from numba import jit
+import pyfftw.interfaces.numpy_fft
 
 @jit
 def make_neg_pos_3d(arr3d):
@@ -81,18 +80,10 @@ def neg_pos_2d(arr2d):
   '''
   each pixel switches from positive to negative in checker board pattern
   '''
-  # if not batch:
-  #   N = int(np.sqrt(arr2d.size))
-  #   arr2d = arr2d.reshape(N,N)
-  #   for r in range(arr2d.shape[0]):
-  #     for c in range(arr2d.shape[1]):
-  #       if (r+c)%2:
-  #         arr2d[r,c] *= -1
   assert arr2d.ndim == 3 # extra axis
   for n_particle in range(arr2d.shape[0]):
     for r in range(arr2d.shape[1]):
       for c in range(arr2d.shape[2]):
         if (r+c)%2:
           arr2d[n_particle,r,c] *= -1
-
   return(arr2d)

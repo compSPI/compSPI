@@ -1,8 +1,7 @@
+import math
 import numpy as np
 import numba as nb
-import math
 import coords
-
 
 
 def make_gauss_2d(xv,yv,mu,sigma):
@@ -25,12 +24,12 @@ def make_map_3d(atoms,xyz,N,sigma):
 @nb.guvectorize([(nb.float64[:,:,:],nb.float64[:,:],nb.int64[:],nb.float64[:,:],nb.int64[:],nb.int64[:],nb.float64[:],nb.float64[:,:])], 
   '(n_proj,r2,r3),(N2,r2),(n_atoms),(r3,n_atoms),(n_atoms),(n_atoms),(n_atoms)->(n_proj,N2)',
   nopython=True,target='cuda')
-def precompute_idx_ntrunc_rot_gpu(Rs,xy,N,atoms,idx,n_trunc,sigma,g_2d):
+def precompute_idx_ntrunc_rot_gpu(rots,xy,N,atoms,idx,n_trunc,sigma,g_2d):
   '''
 
   '''
-  for proj_idx in range(Rs.shape[0]):
-    R = Rs[proj_idx,:,:]
+  for proj_idx in range(rots.shape[0]):
+    rot = rots[proj_idx,:,:]
 
     for i in range(idx.shape[0]): # loop over atoms
       nt_ = (n_trunc[i]-1)//2
@@ -41,8 +40,8 @@ def precompute_idx_ntrunc_rot_gpu(Rs,xy,N,atoms,idx,n_trunc,sigma,g_2d):
       z = atoms[2,i]
 
       # code dot product explicitly
-      x_rot = R[0,0]*x + R[0,1]*y + R[0,2]*z
-      y_rot = R[1,0]*x + R[1,1]*y + R[1,2]*z
+      x_rot = rot[0,0]*x + rot[0,1]*y + rot[0,2]*z
+      y_rot = rot[1,0]*x + rot[1,1]*y + rot[1,2]*z
 
       X = round(x_rot) + N[i]//2
       Y = round(y_rot) + N[i]//2
@@ -58,12 +57,12 @@ def precompute_idx_ntrunc_rot_gpu(Rs,xy,N,atoms,idx,n_trunc,sigma,g_2d):
           g_2d[proj_idx,xy_idx] += gi # TODO double check no racing condition.
 
 def idx_from_atoms(atoms,N):
-  X = np.round(atoms[0]).astype(np.int32) + N//2
-  Y = np.round(atoms[1]).astype(np.int32) + N//2
-  idx = X+N*Y
+  x_idx = np.round(atoms[0]).astype(np.int32) + N//2
+  y_idx = np.round(atoms[1]).astype(np.int32) + N//2
+  idx = x_idx+N*y_idx
   return(idx)
 
-def make_proj_gpu(atoms,xy,N,n_proj,sigma,n_trunc=None,Rs=None,method='precompute_idx_ntrunc_rot_gpu',random_seed=0):
+def make_proj_gpu(atoms,xy,N,n_proj,sigma,n_trunc=None,rots=None,method='precompute_idx_ntrunc_rot_gpu',random_seed=0):
   '''
   rotate point cloud and project onto 2D grid assumig gaussians
   initialization of g_2d and copy steps onto GPU are bottleneck. actual computation of g_2d_gpu stays ms for 1-100k rotations on 128^2 grid and 10-100k atoms. hit memory issues
@@ -72,17 +71,17 @@ def make_proj_gpu(atoms,xy,N,n_proj,sigma,n_trunc=None,Rs=None,method='precomput
   g_2d = np.zeros((n_proj,N*N),dtype=np.float64) # TODO: try to initialize this large array of zeros on host
   if n_trunc is None: n_trunc = np.int64(6*sigma)
   
-  if Rs is None:
+  if rots is None:
     if random_seed is not None: np.random.seed(random_seed)
-    Rs,qs = coords.uniform_rotations(n_proj)
+    rots,qs = coords.uniform_rotations(n_proj)
 
-  assert Rs.shape == (n_proj,3,3)
+  assert rots.shape == (n_proj,3,3)
 
   idx = idx_from_atoms(atoms,N)
 
   # copy data to gpu
   # TODO: see if faster to copy over single scalar (N,n_trunc,sigma) vs vectorized scalar
-  Rs_gpu = nb.cuda.to_device(np.ascontiguousarray(Rs[:,:2,:])) # only need x and y part since will ignore final rotated z coordinate
+  rots_gpu = nb.cuda.to_device(np.ascontiguousarray(rots[:,:2,:])) # only need x and y part since will ignore final rotated z coordinate
     # have to .copy because can only pass in subset on first axis, otherwise error that non-contiguous
   N_gpu = nb.cuda.to_device(N*np.ones(atoms.shape[1]).astype(np.int64))
   n_trunc_gpu = nb.cuda.to_device(n_trunc*np.ones(atoms.shape[1]).astype(np.int64))

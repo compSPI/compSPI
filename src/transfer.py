@@ -1,5 +1,5 @@
 import numpy as np
-import numba
+import numba as nb
 
 
 def ctf_freqs(N, psize=1.0, d=2):
@@ -20,7 +20,7 @@ def ctf_freqs(N, psize=1.0, d=2):
     freq_A_2d = rho * psize
     return(freq_A_2d,angles_rad)
 
-@numba.jit(cache=True, nopython=True, nogil=True)
+@nb.jit(cache=True, nopython=True, nogil=True)
 def eval_ctf(s, a, def1, def2, angast=0, phase=0, kv=300, ac=0.1, cs=2.0, bf=0, lp=0):
     """
     # https://github.com/asarnow/pyem/blob/master/pyem/ctf.py
@@ -80,9 +80,9 @@ def random_ctfs(
     df1s = dfs - df_diff/2
     df2s = dfs + df_diff/2
     df_ang_deg = np.random.uniform(low=df_ang_min,high=df_ang_max,size=n_particles)
-    CTFs = np.empty((n_particles,N,N))
+    ctfs = np.empty((n_particles,N,N))
     freq_A_2d, angles_rad = ctf_freqs(N,psize,d=2)
     for idx in range(n_particles):
         if do_log and idx % max(1,(n_particles//10)) == 0: print(idx)
-        CTFs[idx] = eval_ctf(freq_A_2d, angles_rad, def1=df1s[idx], def2=df2s[idx], angast=df_ang_deg[idx], phase=phase, kv=kv, ac=ac, cs=cs, bf=bf)
-    return(CTFs, df1s, df2s, df_ang_deg)
+        ctfs[idx] = eval_ctf(freq_A_2d, angles_rad, def1=df1s[idx], def2=df2s[idx], angast=df_ang_deg[idx], phase=phase, kv=kv, ac=ac, cs=cs, bf=bf)
+    return(ctfs, df1s, df2s, df_ang_deg)

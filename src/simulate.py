@@ -1,8 +1,11 @@
-import coords, fourier, transfer, gauss_forward_model
 import numpy as np
 import pandas as pd
 from scipy.ndimage import map_coordinates
-import numba
+import coords
+import fourier
+import transfer
+import gauss_forward_model
+
 
 def simulate_slice(map_r,psize,n_particles,N_crop,snr,do_snr=True,
             do_ctf=True,
@@ -33,17 +36,17 @@ def simulate_slice(map_r,psize,n_particles,N_crop,snr,do_snr=True,
     xy0 = xyz[idx_z0]
 
     if random_seed is not None: np.random.seed(random_seed)
-    Rs = coords.uniform_rotations(n_particles)
+    rots = coords.uniform_rotations(n_particles)
 
     proj_f = np.zeros((n_particles,N,N),dtype=np.complex64)
     for idx in range(n_particles):
         if do_log and idx % max(1,(n_particles//10)) == 0: print(idx)
-        R = Rs[:,:,idx]
+        rot = rots[:,:,idx]
         xy0_rot = R.dot(xy0.T).T
         proj_f[idx] = (map_coordinates(map_f.real, xy0_rot.T + N//2,order=1).astype(np.complex64) + 1j*map_coordinates(map_f.imag, xy0_rot.T + N//2,order=1).astype(np.complex64)).reshape(N,N) # important to keep order=1 for speed. linear is good enough
 
     if do_ctf:
-        CTFs, df1s, df2s, df_ang_deg = transfer.random_ctfs(N=N,
+        ctfs, df1s, df2s, df_ang_deg = transfer.random_ctfs(N=N,
                                     psize=psize,
                                     n_particles=n_particles,
                                     df_min=df_min,
@@ -62,7 +65,7 @@ def simulate_slice(map_r,psize,n_particles,N_crop,snr,do_snr=True,
 
 
     
-        proj_f *= CTFs
+        proj_f *= ctfs
 
     i,f = N//2-N_crop//2, N//2+N_crop//2
     proj_r = fourier.do_ifft(proj_f[:,i:f,i:f],d=2,batch=True)
@@ -112,8 +115,8 @@ def simulate_atoms(atoms,N,psize,n_particles,
     if n_trunc is None: n_trunc = 6*sigma
 
     if random_seed is not None: np.random.seed(random_seed)
-    Rs, qs = coords.uniform_rotations(n_particles)
-    g_2d_gpu = gauss_forward_model.make_proj_gpu(atoms/psize,xy,N,n_particles,sigma,n_trunc,Rs) # TODO make general for psize (work in pixel units by converting atoms to pixel units)
+    rots, qs = coords.uniform_rotations(n_particles)
+    g_2d_gpu = gauss_forward_model.make_proj_gpu(atoms/psize,xy,N,n_particles,sigma,n_trunc,rots) # TODO verify general for psize (work in pixel units by converting atoms to pixel units)
     
     if do_log: print('copy_to_host')
     projs_r = g_2d_gpu.copy_to_host().reshape(n_particles,N,N)
@@ -123,7 +126,7 @@ def simulate_atoms(atoms,N,psize,n_particles,
     if do_ctf:
         if do_log:print('CTF')
         projs_f = fourier.do_fft(projs_r,d=2,batch=True) # TODO: may need to zero pad here for CTF
-        CTFs, df1s, df2s, df_ang_deg = transfer.random_ctfs(N=N,
+        ctfs, df1s, df2s, df_ang_deg = transfer.random_ctfs(N=N,
                                   psize=psize,
                                   n_particles=n_particles,
                                   df_min=df_min,
@@ -140,7 +143,7 @@ def simulate_atoms(atoms,N,psize,n_particles,
                                   do_log=do_log
                                   )
 
-        projs_f *= CTFs
+        projs_f *= ctfs
         projs_r = fourier.do_ifft(projs_f,d=2,batch=True)
 
     if do_snr:
