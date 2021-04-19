@@ -111,7 +111,7 @@ def simulate_atoms(atoms,N,psize,n_particles,
     if random_seed is not None: np.random.seed(random_seed)
     Rs, qs = coords.uniform_rotations(n_particles)
     g_2d_gpu = gauss_forward_model.make_proj_gpu(atoms/psize,xy,N,n_particles,sigma,n_trunc,Rs) # TODO make general for psize (work in pixel units by converting atoms to pixel units)
-    projs = g_2d_gpu.copy_to_host().reshape(n_particles,N,N)
+    projs_r = g_2d_gpu.copy_to_host().reshape(n_particles,N,N)
 
     # CTF
     # to avoid CTF aliasing, ensure N is large
