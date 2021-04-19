@@ -44,4 +44,4 @@ def get_random_quat(num_pts):
 def uniform_rotations(num):
   qs = get_random_quat(num)
   Rs = SO3.matrix_from_quaternion(qs) # num,3,3
-  return(Rs)
+  return(Rs,qs)
