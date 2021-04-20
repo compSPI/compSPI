@@ -142,7 +142,7 @@ def simulate_slice(
     if N_crop is not None:
         i, f = N // 2 - N_crop // 2, N // 2 + N_crop // 2
         projs_r = fourier.do_ifft(projs_f[:, i:f, i:f], d=2, batch=True)
-        psize = psize * N / N_crop
+        psize *= N / N_crop
     else:
         projs_r = fourier.do_ifft(projs_f, d=2, batch=True)
 
@@ -155,7 +155,7 @@ def simulate_slice(
 
     meta_data_d = {
         "N": N_crop,
-        "psize": psize_crop,
+        "psize": psize,
         "snr": snr,
         "rotation_quaternion": [np.array2string(q) for q in qs],
     }
