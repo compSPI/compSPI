@@ -104,7 +104,7 @@ def simulate_slice(
     for idx in range(n_particles):
         if do_log and idx % max(1, (n_particles // 10)) == 0:
             print(idx)
-        rot = rots[:, :, idx]
+        rot = rots[idx, :, :]
         xy0_rot = R.dot(xy0.T).T
         projs_f[idx] = (
             map_coordinates(map_f.real, xy0_rot.T + N // 2, order=1).astype(
