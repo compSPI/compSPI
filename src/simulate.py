@@ -98,14 +98,14 @@ def simulate_slice(
 
     if random_seed is not None:
         np.random.seed(random_seed)
-    rots = coords.uniform_rotations(n_particles)
+    rots, qs = coords.uniform_rotations(n_particles)
 
     projs_f = np.zeros((n_particles, N, N), dtype=np.complex64)
     for idx in range(n_particles):
         if do_log and idx % max(1, (n_particles // 10)) == 0:
             print(idx)
         rot = rots[idx, :, :]
-        xy0_rot = R.dot(xy0.T).T
+        xy0_rot = rot.dot(xy0.T).T
         projs_f[idx] = (
             map_coordinates(map_f.real, xy0_rot.T + N // 2, order=1).astype(
                 np.complex64
@@ -153,14 +153,14 @@ def simulate_slice(
     else:
         projs_r_noise = projs_r
 
-    d = {
+    meta_data_d = {
         "N": N_crop,
         "psize": psize_crop,
         "snr": snr,
         "rotation_quaternion": [np.array2string(q) for q in qs],
     }
     if do_ctf:
-        d.update(
+        meta_data_d.update(
             {
                 "df1_A": df1s,
                 "df2_A": df2s,
@@ -170,7 +170,7 @@ def simulate_slice(
                 "cs_mm": cs,
             }
         )
-    meta_data_df = pd.DataFrame(d)
+    meta_data_df = pd.DataFrame(meta_data_d)
 
     return (projs_r, projs_r_noise, meta_data_df)
 
@@ -314,14 +314,14 @@ def simulate_atoms(
     else:
         projs_r_noise = projs_r
 
-    d = {
+    meta_data_d = {
         "N": N,
         "psize": psize,
         "snr": snr,
         "rotation_quaternion": [np.array2string(q) for q in qs],
     }
     if do_ctf:
-        d.update(
+        meta_data_d.update(
             {
                 "df1_A": df1s,
                 "df2_A": df2s,
@@ -331,6 +331,6 @@ def simulate_atoms(
                 "cs_mm": cs,
             }
         )
-    meta_data_df = pd.DataFrame(d)
+    meta_data_df = pd.DataFrame(meta_data_d)
 
     return (projs_r, projs_r_noise, meta_data_df)
