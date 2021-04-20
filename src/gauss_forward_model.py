@@ -57,15 +57,15 @@ def precompute_idx_ntrunc_rot_gpu(rots, xy, N, atoms, idx, n_trunc, sigma, g_2d)
             x_rot = rot[0, 0] * x + rot[0, 1] * y + rot[0, 2] * z
             y_rot = rot[1, 0] * x + rot[1, 1] * y + rot[1, 2] * z
 
-            X = round(x_rot) + N[i] // 2
-            Y = round(y_rot) + N[i] // 2
+            x_idx = round(x_rot) + N[i] // 2
+            y_idx = round(y_rot) + N[i] // 2
             idx[i] = (
-                X + N[i] * Y
+                x_idx + N[i] * y_idx
             )  # this has to match with xy (vs yx). check xy[[0,1],:] = xy[[1,0],:] if problems
 
-            for x_idx in range(idx[i] - nt_, idx[i] + nt_ + 1, 1):
-                for y_idx in range(-nt_, +nt_ + 1, 1):
-                    xy_idx = x_idx + y_idx * N[i]
+            for x_idx_offset in range(idx[i] - nt_, idx[i] + nt_ + 1, 1):
+                for y_idx_offset in range(-nt_, +nt_ + 1, 1):
+                    xy_idx = x_idx_offset + y_idx_offset * N[i]
                     diffx = xy[xy_idx, 0] - x_rot  # atom locations in pixel units
                     diffy = xy[xy_idx, 1] - y_rot
                     d2i = diffx * diffx + diffy * diffy
