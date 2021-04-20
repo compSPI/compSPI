@@ -131,7 +131,7 @@ def make_proj_gpu(
 
     # TODO: for more rotations, put in loop so don't have to redo copy to GPU of other data
     precompute_idx_ntrunc_rot_gpu(
-        Rs_gpu, xy_gpu, N_gpu, atoms_gpu, idx_gpu, n_trunc_gpu, sigma_gpu, g_2d_gpu
+        rots_gpu, xy_gpu, N_gpu, atoms_gpu, idx_gpu, n_trunc_gpu, sigma_gpu, g_2d_gpu
     )
     # TODO look into quick copy to CPU, or doing further GPU computations (taking loss etc)
     return g_2d_gpu
