@@ -29,61 +29,61 @@ def simulate_slice(
     do_log=True,
     random_seed=0,
 ):
-"""
-Simulates a particle stack from a 3D voxelized array using the Fourier slice theorem (projection assumption).
+    """
+    Simulates a particle stack from a 3D voxelized array using the Fourier slice theorem (projection assumption).
 
-Parameters
-----------
-    map_r : numpy.ndarray, shape (N,N,N)
-        3D real space map of shape 
-    psize : float
-        pixel size in Angstroms
-    n_particles: int
-        number of particles to simulate
-    N_crop : in
-        number of pixels to crop to
-    snr : float
-        signal to noise ratio. defined as the std(signal) / std(noise). the signal is the projections (with ctf if that's included)
-    do_snr : bool 
-        add nosie when True
-    do_ctf : bool 
-        add ctf when True
-    df_min : float 
-        defocus range min
-    df_max : float 
-        defocus range max
-    df_diff_min : float 
-        defocus difference range min
-    df_diff_max : float 
-        defocus difference range max
-    df_ang_min : float 
-        angle of astigmatism range min
-    df_ang_max : float 
-        angle of astigmatism range max
-    kv : float 
-        voltate of microscope in kilo electron volts (typicaly 120, 200, 300 on electron microscopes)
-    cs : float 
-        spherical aberation constant in mm
-    ac : float 
-        amplitude contrast
-    phase : float 
-        ctf phase
-    bf : float 
-        B-factor for CTF envelope. no envelope when 0
-    do_log : bool 
-        log progress if True. TODO: add to logger instead of print
-    random_seed : int 
-        random_seed for np.random.seed(random_seed)
+    Parameters
+    ----------
+        map_r : numpy.ndarray, shape (N,N,N)
+            3D real space map of shape 
+        psize : float
+            pixel size in Angstroms
+        n_particles: int
+            number of particles to simulate
+        N_crop : in
+            number of pixels to crop to
+        snr : float
+            signal to noise ratio. defined as the std(signal) / std(noise). the signal is the projections (with ctf if that's included)
+        do_snr : bool 
+            add nosie when True
+        do_ctf : bool 
+            add ctf when True
+        df_min : float 
+            defocus range min
+        df_max : float 
+            defocus range max
+        df_diff_min : float 
+            defocus difference range min
+        df_diff_max : float 
+            defocus difference range max
+        df_ang_min : float 
+            angle of astigmatism range min
+        df_ang_max : float 
+            angle of astigmatism range max
+        kv : float 
+            voltate of microscope in kilo electron volts (typicaly 120, 200, 300 on electron microscopes)
+        cs : float 
+            spherical aberation constant in mm
+        ac : float 
+            amplitude contrast
+        phase : float 
+            ctf phase
+        bf : float 
+            B-factor for CTF envelope. no envelope when 0
+        do_log : bool 
+            log progress if True. TODO: add to logger instead of print
+        random_seed : int 
+            random_seed for np.random.seed(random_seed)
 
-Returns
-------- 
-    projs_r: numpy.ndarray
-        particle stack of simulated projections. shape (n_particles,N_crop,N_crop)
-    projs_r_noise : numpy.ndarray
-        particle stack of simulated projections with noise. shape (n_particles,N_crop,N_crop)
-    meta_data_df : pandas.DataFrame
-        metadata of simulated particles, including sampled ctf
-"""
+    Returns
+    ------- 
+        projs_r: numpy.ndarray, shape (n_particles,N_crop,N_crop)
+            particle stack of simulated projections
+        projs_r_noise : numpy.ndarray, shape (n_particles,N_crop,N_crop)
+            particle stack of simulated projections with noise
+        meta_data_df : pandas.DataFrame
+            metadata of simulated particles, including sampled ctf
+    """
     assert len(map_r.shape) == 3
     assert np.unique(map_r.shape).size == 1
     N = map_r.shape[0]
@@ -199,66 +199,66 @@ def simulate_atoms(
     do_log=True,
     random_seed=0,
 ):
-"""
-Simulates a particle stack from 3D atomic coordinates (superposition approximiation).
+    """
+    Simulates a particle stack from 3D atomic coordinates (superposition approximiation).
 
-Parameters
-----------
-    atoms : numpy.ndarray
-        xyz coordinates of atoms of shape (3,n_atoms)
-    N : int
-        number of pixels for projections of shape (N,N). #TODO add N_crop (after ctf)
-    psize : float
-        pixel size in Angstroms
-    n_particles : int
-        number of particles to simulate
-    sigma : float
-        spread of Gaussian blob of atom. atomic B-factor. in units of pixels (not angstroms) 
-        # TODO: extend to have per atom sigmas (and n_trunc)
-    n_trunc : int
-        size of patch around Gaussian blob, outside of which the Gaussian is truncated to zero. Reasonable value of int(6*sigma), because gaussian near zero 3 sigma away from mean 
-    snr : float
-        signal to noise ratio. defined as the std(signal) / std(noise). the signal is the projections (with ctf if that's included)
-    do_snr : bool 
-        add nosie when True
-    do_ctf : bool 
-        add ctf when True
-    df_min : float 
-        defocus range min
-    df_max : float 
-        defocus range max
-    df_diff_min : float 
-        defocus difference range min
-    df_diff_max : float 
-        defocus difference range max
-    df_ang_min : float 
-        angle of astigmatism range min
-    df_ang_max : float 
-        angle of astigmatism range max
-    kv : float 
-        voltate of microscope in kilo electron volts (typicaly 120, 200, 300 on electron microscopes)
-    cs : float 
-        spherical aberation constant in mm
-    ac : float 
-        amplitude contrast
-    phase : float 
-        ctf phase
-    bf : float 
-        B-factor for CTF envelope. no envelope when 0
-    do_log : bool 
-        log progress if True. TODO: add to logger instead of print
-    random_seed : int 
-        random_seed for np.random.seed(random_seed)
+    Parameters
+    ----------
+        atoms : numpy.ndarray
+            xyz coordinates of atoms of shape (3,n_atoms)
+        N : int
+            number of pixels for projections of shape (N,N). #TODO add N_crop (after ctf)
+        psize : float
+            pixel size in Angstroms
+        n_particles : int
+            number of particles to simulate
+        sigma : float
+            spread of Gaussian blob of atom. atomic B-factor. in units of pixels (not angstroms) 
+            # TODO: extend to have per atom sigmas (and n_trunc)
+        n_trunc : int
+            size of patch around Gaussian blob, outside of which the Gaussian is truncated to zero. Reasonable value of int(6*sigma), because gaussian near zero 3 sigma away from mean 
+        snr : float
+            signal to noise ratio. defined as the std(signal) / std(noise). the signal is the projections (with ctf if that's included)
+        do_snr : bool 
+            add nosie when True
+        do_ctf : bool 
+            add ctf when True
+        df_min : float 
+            defocus range min
+        df_max : float 
+            defocus range max
+        df_diff_min : float 
+            defocus difference range min
+        df_diff_max : float 
+            defocus difference range max
+        df_ang_min : float 
+            angle of astigmatism range min
+        df_ang_max : float 
+            angle of astigmatism range max
+        kv : float 
+            voltate of microscope in kilo electron volts (typicaly 120, 200, 300 on electron microscopes)
+        cs : float 
+            spherical aberation constant in mm
+        ac : float 
+            amplitude contrast
+        phase : float 
+            ctf phase
+        bf : float 
+            B-factor for CTF envelope. no envelope when 0
+        do_log : bool 
+            log progress if True. TODO: add to logger instead of print
+        random_seed : int 
+            random_seed for np.random.seed(random_seed)
 
-Returns
-------- 
-    projs_r: numpy.ndarray
-        particle stack of simulated projections. shape (n_particles,N_crop,N_crop)
-    projs_r_noise : numpy.ndarray
-        particle stack of simulated projections with noise. shape (n_particles,N_crop,N_crop)
-    meta_data_df : pandas.DataFrame
-        metadata of simulated particles, including sampled ctf
-"""
+    Returns
+    ------- 
+        projs_r: numpy.ndarray, shape (n_particles,N_crop,N_crop)
+            particle stack of simulated projections
+        projs_r_noise : numpy.ndarray, shape (n_particles,N_crop,N_crop)
+            particle stack of simulated projections with noise
+        meta_data_df : pandas.DataFrame
+            metadata of simulated particles, including sampled ctf
+    """
     assert atoms.shape[0] == 3
     n_atoms = atoms.shape[-1]
     assert N % 2 == 0, "even pixel length"
