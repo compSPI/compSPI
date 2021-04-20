@@ -89,7 +89,7 @@ def simulate_slice(
     N = map_r.shape[0]
     assert N % 2 == 0, "even pixel length"
 
-    map_f = fourier.do_fft(map_r)
+    map_f = fourier.do_fft(map_r,d=3)
 
     N = map_f.shape[0]
     xyz = coords.coords_n_by_d(np.arange(-N // 2, N // 2), d=3)
@@ -310,7 +310,7 @@ def simulate_atoms(
     if do_snr:
         signal = np.std(projs_r)
         noise = signal / snr
-        projs_r_noise = np.random.normal(loc=projs_r, scale=noise)
+        projs_r_noise = np.random.normal(loc=projs_r, scale=noise)  
     else:
         projs_r_noise = projs_r
 
