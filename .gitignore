@@ -9,3 +9,6 @@ results/*
 
 # Local data directory that stores cryoem data
 data/*
+
+# Local directories with checkpoint for analysis
+notebooks/cvpr2020_analysis/**/train_vae/
