@@ -32,7 +32,7 @@ def deg_to_rad(deg):
 
 def get_random_quat(num_pts):
     """
-    Get num_pts of unit quaternions on the 4 hemisphere with a uniform random distribution.
+    Get num_pts of unit quaternions on the sphere with a uniform random distribution.
     :param num_pts: The number of quaternions to return
     :return: Quaternion list of shape [number of quaternion, 4]
     """
@@ -40,10 +40,10 @@ def get_random_quat(num_pts):
     u1, u2, u3 = [u[x] for x in range(3)]
 
     quat = np.zeros((4, num_pts))
-    quat[0] = np.sqrt(1 - u1) * np.sin(np.pi * u2 / 2)
-    quat[1] = np.sqrt(1 - u1) * np.cos(np.pi * u2 / 2)
-    quat[2] = np.sqrt(u1) * np.sin(np.pi * u3 / 2)
-    quat[3] = np.sqrt(u1) * np.cos(np.pi * u3 / 2)
+    quat[0] = np.sqrt(1 - u1) * np.sin(2 * np.pi * u2)
+    quat[1] = np.sqrt(1 - u1) * np.cos(2 * np.pi * u2)
+    quat[2] = np.sqrt(u1) * np.sin(2 * np.pi * u3)
+    quat[3] = np.sqrt(u1) * np.cos(2 * np.pi * u3)
 
     return np.transpose(quat)
 
