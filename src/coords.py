@@ -50,10 +50,10 @@ def get_random_quat(num_pts,method = 'sphere'):
     else:
       assert False, 'use hemisphere or sphere'
     
-    quat[0] = np.sqrt(1 - u1) * np.sin(np.pi * u2 / 2)
-    quat[1] = np.sqrt(1 - u1) * np.cos(np.pi * u2 / 2)
-    quat[2] = np.sqrt(u1) * np.sin(np.pi * u3 / 2)
-    quat[3] = np.sqrt(u1) * np.cos(np.pi * u3 / 2)
+    quat[0] = np.sqrt(1 - u1) * np.sin(angle * u2)
+    quat[1] = np.sqrt(1 - u1) * np.cos(angle * u2)
+    quat[2] = np.sqrt(u1) * np.sin(angle * u3)
+    quat[3] = np.sqrt(u1) * np.cos(angle * u3)
 
     return np.transpose(quat)
 
