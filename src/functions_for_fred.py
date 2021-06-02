@@ -6,7 +6,8 @@ import os
 import numpy as np
 import torch
 
-import nn, nn_old
+import nn
+import nn_old
 
 CUDA = torch.cuda.is_available()
 DEVICE = torch.device('cuda' if CUDA else 'cpu')
