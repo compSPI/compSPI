@@ -1,6 +1,6 @@
 import numpy as np
-from numba import jit
 import pyfftw.interfaces.numpy_fft
+from numba import jit
 
 
 @jit

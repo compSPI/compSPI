@@ -1,6 +1,8 @@
 import math
-import numpy as np
+
 import numba as nb
+import numpy as np
+
 import coords
 
 
@@ -41,7 +43,7 @@ def make_map_3d(atoms, xyz, N, sigma):
     target="cuda",
 )
 def precompute_idx_ntrunc_rot_gpu(rots, xy, N, atoms, idx, n_trunc, sigma, g_2d):
-    """"""
+    """ """
     for proj_idx in range(rots.shape[0]):
         rot = rots[proj_idx, :, :]
 
