@@ -439,8 +439,10 @@ def plot_pred2d(angle_pred, defocus_pred, angle_true, defocus_true, figname=""):
 # < BIPLOTS
 
 
-def biplot_histncontour(x, y, bins=150, levels=[1, 3, 5]):
+def biplot_histncontour(x, y, bins=150, levels=None):
     """ """
+    if levels is None:
+        levels = [1, 3, 5]
     fig = plt.figure(figsize=(18, 9))
     plt.subplot(121)
     counts, xbins, ybins, image = plt.hist2d(
@@ -885,13 +887,17 @@ def plot_roc_curve(
     mus,
     Zscore,
     Zscore_set,
-    methods=["robust_covar", "isolation_forest", "local_outlier_detection"],
-    labels=["Robust Covariance Method", "Isolation Forest", "Local Outlier Detection"],
+    methods=None,
+    labels=None,
     xlabel="False Positive Rate",
     ylabel="True Positive Rate",
     figname="",
 ):
     """ """
+    if methods is None:
+        methods = ["robust_covar", "isolation_forest", "local_outlier_detection"]
+    if labels is None:
+        labels = ["Robust Covariance Method", "Isolation Forest", "Local Outlier Detection"]
     fig = plt.figure(figsize=(6, 6), dpi=180)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
