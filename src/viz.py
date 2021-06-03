@@ -897,7 +897,11 @@ def plot_roc_curve(
     if methods is None:
         methods = ["robust_covar", "isolation_forest", "local_outlier_detection"]
     if labels is None:
-        labels = ["Robust Covariance Method", "Isolation Forest", "Local Outlier Detection"]
+        labels = [
+            "Robust Covariance Method",
+            "Isolation Forest",
+            "Local Outlier Detection",
+        ]
     fig = plt.figure(figsize=(6, 6), dpi=180)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
