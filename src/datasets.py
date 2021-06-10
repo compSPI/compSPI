@@ -15,6 +15,7 @@ import pandas as pd
 import torch
 import torch.utils
 
+
 # from geomstats.geometry.spd_matrices_space import SPDMatricesSpace
 from skimage import transform
 from torchvision import datasets, transforms
@@ -63,8 +64,11 @@ def get_datasets(
     train_params=None,
     synthetic_params=None,
     class_2d=None,
-    kwargs=KWARGS,
+    kwargs=None,
 ):
+
+    if kwargs is None:
+        kwargs = KWARGS
 
     img_shape_no_channel = None
     if img_shape is not None:
@@ -97,7 +101,9 @@ def get_datasets(
         dataset = get_dataset_cryo_exp(img_shape_no_channel, kwargs)
         train_dataset, val_dataset = split_dataset(dataset)
     elif dataset_name == "cryo_exp_class_2d":
-        dataset = get_dataset_cryo_exp_class_2d(img_shape_no_channel, class_2d, kwargs)
+        dataset = get_dataset_cryo_exp_class_2d(
+            img_shape_no_channel, class_2d
+        )  # , kwargs)
         train_dataset, val_dataset = split_dataset(dataset)
     elif dataset_name == "cryo_exp_3d":
         dataset = get_dataset_cryo_exp_3d(img_shape_no_channel, kwargs)
@@ -130,9 +136,10 @@ def get_datasets(
     return train_dataset, val_dataset
 
 
-def split_dataset(
-    dataset, frac_val=FRAC_VAL, labels_path=None, save=False, data_dir=None
-):
+def split_dataset(dataset, frac_val=FRAC_VAL):
+    # labels_path=None,
+    # save=False,
+    # data_dir=None):
     length = len(dataset)
     train_length = int((1 - frac_val) * length)
     train_dataset = dataset[:train_length]
@@ -201,6 +208,9 @@ def r_pearson_from_z_score(mat):
 
 
 def get_dataset_mnist(img_shape_no_channel=(28, 28)):
+    # TO CHECK
+    NEURO_TRAIN_VAL_DIR = None
+    # TO CHECK
     shape_str = get_shape_string(img_shape_no_channel)
     train_path = os.path.join(NEURO_TRAIN_VAL_DIR, "train_mnist_%s.npy" % shape_str)
     val_path = os.path.join(NEURO_TRAIN_VAL_DIR, "val_mnist_%s.npy" % shape_str)
@@ -255,7 +265,12 @@ def get_dataset_mnist(img_shape_no_channel=(28, 28)):
     return train_dataset, val_dataset
 
 
-def get_dataset_cryo_sphere(img_shape_no_channel=None, kwargs=KWARGS):
+def get_dataset_cryo_sphere(img_shape_no_channel=None, kwargs=None):
+    if kwargs is None:
+        kwargs = KWARGS
+    # TO CHECK
+    CRYO_TRAIN_VAL_DIR = None
+    # TO CHECK
     shape_str = get_shape_string(img_shape_no_channel)
     cryo_path = os.path.join(CRYO_TRAIN_VAL_DIR, "cryo_%s.npy" % shape_str)
 
@@ -415,7 +430,9 @@ def get_dataset_cryo_exp(img_shape_no_channel=None, kwargs=KWARGS):
 
 
 def get_dataset_cryo_exp_class_2d(
-    img_shape_no_channel=None, class_2d=None, kwargs=KWARGS
+    img_shape_no_channel=None,
+    class_2d=None,
+    # kwargs=KWARGS
 ):
     CRYO_TRAIN_VAL_DIR = os.path.join(CRYO_DIR, "train_val_datasets")
     shape_str = get_shape_string(img_shape_no_channel)

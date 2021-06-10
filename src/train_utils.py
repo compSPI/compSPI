@@ -194,7 +194,7 @@ def init_training(train_dir, nn_architecture, train_params):
     ckpts = glob.glob(path_base)
     if len(ckpts) == 0:
         weights_init = train_params["weights_init"]
-        logging.info("No checkpoints found. Initializing with %s." % weights_init)
+        logging.info("No checkpoints found. Initializing with %s.", weights_init)
 
         for module_name, module in modules.items():
             if nn_architecture["nn_type"] == "toy":
@@ -204,7 +204,7 @@ def init_training(train_dir, nn_architecture, train_params):
 
     else:
         ckpts_ids_and_paths = [(int(f.split("_")[-2]), f) for f in ckpts]
-        ckpt_id, ckpt_path = max(ckpts_ids_and_paths, key=lambda item: item[0])
+        _, ckpt_path = max(ckpts_ids_and_paths, key=lambda item: item[0])
         logging.info("Found checkpoints. Initializing with %s." % ckpt_path)
         if torch.cuda.is_available():
             map_location = lambda storage, loc: storage.cuda()
@@ -241,6 +241,7 @@ def save_checkpoint(
     nn_architecture,
     train_params,
 ):
+    """save_checkpoint"""
     checkpoint = {}
     for module_name in modules.keys():
         module = modules[module_name]
@@ -266,7 +267,7 @@ def load_checkpoint(output, epoch_id=None):
             raise ValueError("No checkpoints found.")
         else:
             ckpts_ids_and_paths = [(int(f.split("_")[-2]), f) for f in ckpts]
-            ckpt_id, ckpt_path = max(ckpts_ids_and_paths, key=lambda item: item[0])
+            _, ckpt_path = max(ckpts_ids_and_paths, key=lambda item: item[0])
     else:
         # Load module corresponding to epoch_id
         ckpt_path = "%s/checkpoint_%d/epoch_%d_checkpoint.pth" % (

@@ -36,7 +36,12 @@ def outlier_measure(X, method="robust_covar"):
 
 
 def pred3d(
-    X, quaternion_true, defocus_true, defocus_min=0.5, defocus_max=2.5, do_ellipse=False
+    X,
+    # quaternion_true,
+    # defocus_true,
+    defocus_min=0.5,
+    defocus_max=2.5,
+    # do_ellipse=False,
 ):
     """ """
     #
@@ -57,7 +62,11 @@ def pred3d(
 
 
 def pred3d_mse(
-    quaternion_pred, defocus_pred, quaternion_true, defocus_true, ntry=10000
+    quaternion_pred,
+    # defocus_pred,
+    quaternion_true,
+    # defocus_true,
+    ntry=10000,
 ):
     """ """
     mse_list = []
@@ -91,7 +100,7 @@ def quat_mse(rotmat, quaternion_pred, quaternion_true):
 
 def pred2d(
     X,
-    angle_true,
+    # angle_true,
     defocus_true,
     angle_pred_sign=1.0,
     defocus_min=0.5,
@@ -105,7 +114,7 @@ def pred2d(
         a = np.max(axis)
         b = np.min(axis)
         e = np.sqrt(1.0 - (b / a) ** 2)
-        rho_centered, theta = cart2sph(X[:, 0] - center[0], X[:, 1] - center[1])
+        rho_centered, theta = cart2pol(X[:, 0] - center[0], X[:, 1] - center[1])
         rho_ellipse = b / (np.sqrt(1.0 - (e * np.cos(theta - theta_0)) ** 2))
         rho = rho_centered / rho_ellipse
     else:
@@ -133,7 +142,7 @@ def pred2d_mse(
     angle_true,
     defocus_true,
     angle_offset_range=np.arange(-100, 100, 10),
-    defocus_offset_range=0,
+    # defocus_offset_range=0,
     angle_weight=None,
     norm_weights=True,
     n_periodicity=1,
@@ -201,7 +210,8 @@ def cart2sph(x, y, z):
     xy = x ** 2 + y ** 2
     r = np.sqrt(xy + z ** 2)
     elev = np.arctan2(np.sqrt(xy), z)  # for elevation angle defined from Z-axis down
-    # ptsnew[:,4] = np.arctan2(xyz[:,2], np.sqrt(xy)) # for elevation angle defined from XY-plane up
+    # ptsnew[:,4] = np.arctan2(xyz[:,2], np.sqrt(xy))
+    # for elevation angle defined from XY-plane up
     azim = np.arctan2(y, x)
     return r, elev, azim
 
@@ -245,8 +255,10 @@ def glomangle_to_quaternion(psi, theta, phi, as_degrees=True):
 # Non-linear fitting to an ellipse #
 ####################################
 def fitEllipse(data):
-    # from https://stackoverflow.com/questions/39693869/fitting-an-ellipse-to-a-set-of-data-points-in-python/48002645
-    # see also http://nicky.vanforeest.com/misc/fitEllipse/fitEllipse.html
+    """fitEllipse
+    from https://stackoverflow.com/questions/39693869/fitting-an-ellipse-to-a-set-of-data-points-in-python/48002645
+    see also http://nicky.vanforeest.com/misc/fitEllipse/fitEllipse.html
+    """
     x = data[:, 0]
     y = data[:, 1]
     x = x[:, None]  # np.newaxis]
@@ -269,7 +281,8 @@ def fitEllipse(data):
 
 
 def ellipse_center(a):
-    b, c, d, f, g, a = a[1] / 2, a[2], a[3] / 2, a[4] / 2, a[5], a[0]
+    """ellipse_center"""
+    b, c, d, f, _, a = a[1] / 2, a[2], a[3] / 2, a[4] / 2, a[5], a[0]
     num = b * b - a * c
     x0 = (c * d - b * f) / num
     y0 = (a * f - b * d) / num
@@ -277,7 +290,8 @@ def ellipse_center(a):
 
 
 def ellipse_angle_of_rotation(a):
-    b, c, d, f, g, a = a[1] / 2, a[2], a[3] / 2, a[4] / 2, a[5], a[0]
+    """ellipse_angle_of_rotation"""
+    b, c, _, _, _, a = a[1] / 2, a[2], a[3] / 2, a[4] / 2, a[5], a[0]
     if b == 0:
         if a > c:
             return 0
@@ -291,6 +305,7 @@ def ellipse_angle_of_rotation(a):
 
 
 def ellipse_axis_length(a):
+    """ellipse_axis_length"""
     b, c, d, f, g, a = a[1] / 2, a[2], a[3] / 2, a[4] / 2, a[5], a[0]
     up = 2 * (a * f * f + c * d * d + g * b * b - 2 * b * d * f - a * c * g)
     down1 = (b * b - a * c) * (
@@ -308,6 +323,7 @@ def ellipse_axis_length(a):
 # CONE FITTING #
 ################
 def rotate_to_fit_cone(X, ntry):
+    """rotate_to_fit_cone"""
     dim = X.shape[1]
     score_list = []
     rotmat = np.identity(dim)  # np.diag([1,1,1])
@@ -342,6 +358,7 @@ def rotate_to_fit_cone(X, ntry):
 
 
 def rotate_to_fit_cone_2d(X, ntry):
+    """rotate_to_fit_cone_2d"""
     score_list = []
     rotmat = np.diag([1, 1, 1])
     X_rotated = np.dot(rotmat, X[:, 0:3].T).T
@@ -375,6 +392,7 @@ def rotate_to_fit_cone_2d(X, ntry):
 
 
 def linear_1d(x, A, B):
+    """linear_1d"""
     return A * x + B
 
 

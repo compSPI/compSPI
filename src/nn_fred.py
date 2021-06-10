@@ -98,6 +98,9 @@ def conv_transpose_output_size(
     dilation=DIL,
 ):
     conv_dim = len(in_shape[1:])
+    # vvv TO CHECK
+    i_dim = conv_dim
+    # ^^^ TO CHECK
     kernel_size, stride, padding, dilation = conv_parameters(
         conv_dim, kernel_size, stride, padding, dilation
     )
@@ -909,7 +912,14 @@ class DecoderConvOrig(nn.Module):
             dilation=DEC_DIL,
         )
 
-    def block(self, block_id, in_shape, channels_fact, scale_factor=2, pad=1):
+    def block(
+        self,
+        # block_id,
+        in_shape,
+        channels_fact,
+        scale_factor=2,
+        pad=1,
+    ):
         """
         In backward order.
         """

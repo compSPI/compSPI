@@ -20,8 +20,7 @@ def visualize_simple(
     markersize=24,
     cmap1=None,
     cmap2=None,
-    show_3dpsd=True,
-    show_1dpsd=True,
+    # show_3dpsd=True, show_1dpsd=True,
     figname="",
 ):
     """ """
@@ -234,6 +233,7 @@ def show_latentspace(
     fontsize=18,
     figname="",
 ):
+    """show_latentspace"""
     proj = mus
     if do_pca:
         U, L, Vt = np.linalg.svd(mus, full_matrices=False)
@@ -298,13 +298,14 @@ def show_latentspace_v2(
     mus,
     metadata,
     do_pca=False,
-    label0="",
+    # label0='',
     label1="",
     figsize=10,
     dpi=180,
     fontsize=18,
     figname="",
 ):
+    """show_latentspace_v2"""
     proj = mus
     if do_pca:
         U, L, Vt = np.linalg.svd(mus, full_matrices=False)
@@ -319,7 +320,6 @@ def show_latentspace_v2(
     plt.grid(which="major")
     plt.tick_params(labelbottom=False, labelleft=False)
     plt.scatter(proj[:, 0], proj[:, 1], c=metadata[:, 1], cmap="twilight")
-    # cbar = plt.colorbar(ticks=[np.min(metadata[:,1]), np.mean(metadata[:,1]), np.max(metadata[:,1])])
     cbar = plt.colorbar(ticks=[-180, 180])
     cbar.set_label(label1, rotation=270)
     #
@@ -329,7 +329,6 @@ def show_latentspace_v2(
     plt.grid()
     plt.tick_params(labelbottom=False, labelleft=False)
     plt.scatter(proj[:, 0], proj[:, 1], c=metadata[:, 0], cmap="rainbow")
-    # cbar = plt.colorbar(ticks=[np.min(metadata[:,0]), np.mean(metadata[:,0]), np.max(metadata[:,0])])
     cbar = plt.colorbar(ticks=[0, 3])
     cbar.set_label(label1, rotation=270)
     plt.tight_layout()
@@ -439,11 +438,13 @@ def plot_pred2d(angle_pred, defocus_pred, angle_true, defocus_true, figname=""):
 # < BIPLOTS
 
 
-def biplot_histncontour(x, y, bins=150, levels=[1, 3, 5]):
+def biplot_histncontour(x, y, bins=150, levels=None):
     """ """
+    if levels is None:
+        levels = [1, 3, 5]
     fig = plt.figure(figsize=(18, 9))
     plt.subplot(121)
-    counts, xbins, ybins, image = plt.hist2d(
+    counts, xbins, ybins, _ = plt.hist2d(
         x, y, bins=bins, norm=LogNorm(), cmap=plt.cm.inferno
     )
     plt.colorbar()
@@ -632,6 +633,7 @@ def biplots(
 
 
 def biplot_c(c, c2, cmap, c2map, plottype, plottype2):
+    """biplot_c"""
     if c is not None:
         plottype = "scatter"
     if c2 is not None:
@@ -655,6 +657,7 @@ def biplot_c(c, c2, cmap, c2map, plottype, plottype2):
 
 
 def biplot_size(figsize, n):
+    """biplot_size"""
     if figsize < 0:
         if n == 1:
             figsize = 1
@@ -686,6 +689,7 @@ def biplot_axis(
     x_range=None,
     y_range=None,
 ):
+    """biplot_axis"""
     minorticklocator = MultipleLocator(minortick)
     majorticklocator = MultipleLocator(majortick)
     ax = fig.add_subplot(gs[i, j])
@@ -709,36 +713,19 @@ def biplot_axis(
     if i == 0 and j != n - 1:
         ax.set_xlabel(labels[j], fontsize="xx-large")
         ax.xaxis.set_label_position("top")
-        if j == 1:
-            ax.tick_params(
-                axis="both",
-                which="both",
-                bottom=False,
-                top=False,
-                left=False,
-                right=False,
-                labelbottom=False,
-                labeltop=False,
-                labelleft=False,
-                labelright=False,
-                # bottom=False,top=False,left=True,right=False,
-                # labelbottom=False,labeltop=False,labelleft=True,labelright=False,
-                labelsize="large",
-            )
-        else:
-            ax.tick_params(
-                axis="both",
-                which="both",
-                bottom=False,
-                top=False,
-                left=False,
-                right=False,
-                labelbottom=False,
-                labeltop=False,
-                labelleft=False,
-                labelright=False,
-                labelsize="large",
-            )
+        ax.tick_params(
+            axis="both",
+            which="both",
+            bottom=False,
+            top=False,
+            left=False,
+            right=False,
+            labelbottom=False,
+            labeltop=False,
+            labelleft=False,
+            labelright=False,
+            labelsize="large",
+        )
     elif i == 0 and j == n - 1:
         ax.set_xlabel(labels[j], fontsize="xx-large")
         ax.xaxis.set_label_position("top")
@@ -885,13 +872,21 @@ def plot_roc_curve(
     mus,
     Zscore,
     Zscore_set,
-    methods=["robust_covar", "isolation_forest", "local_outlier_detection"],
-    labels=["Robust Covariance Method", "Isolation Forest", "Local Outlier Detection"],
+    methods=None,
+    labels=None,
     xlabel="False Positive Rate",
     ylabel="True Positive Rate",
     figname="",
 ):
     """ """
+    if methods is None:
+        methods = ["robust_covar", "isolation_forest", "local_outlier_detection"]
+    if labels is None:
+        labels = [
+            "Robust Covariance Method",
+            "Isolation Forest",
+            "Local Outlier Detection",
+        ]
     fig = plt.figure(figsize=(6, 6), dpi=180)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)

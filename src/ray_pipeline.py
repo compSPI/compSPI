@@ -66,6 +66,7 @@ DATA_DIM = functools.reduce((lambda x, y: x * y), IMG_SHAPE)
 LATENT_DIM = 3
 NN_TYPE = "conv_orig"
 assert NN_TYPE in ["toy", "fc", "conv", "conv_plus", "conv_orig"]
+SPD = None
 
 NN_ARCHITECTURE = {
     "img_shape": IMG_SHAPE,
@@ -128,6 +129,9 @@ class Config(object):
 
 
 class Train(Trainable):
+    """class Train"""
+
+class Train(Trainable):
     def _setup(self, config):
 
         if not WITH_RAY:
@@ -162,8 +166,8 @@ class Train(Trainable):
             class_2d=train_params["class_2d"],
         )
 
-        logging.info("Train: %s" % train_utils.get_logging_shape(train_dataset))
-        logging.info("Val: %s" % train_utils.get_logging_shape(val_dataset))
+        logging.info("Train: %s", train_utils.get_logging_shape(train_dataset))
+        logging.info("Val: %s", train_utils.get_logging_shape(val_dataset))
 
         logging.info("NN architecture: ")
         logging.info(nn_architecture)
@@ -254,7 +258,7 @@ class Train(Trainable):
             z_from_prior = nn.sample_from_prior(
                 nn_architecture["latent_dim"], n_samples=n_batch_data
             ).to(DEVICE)
-            batch_from_prior, scale_b_from_prior = decoder(z_from_prior)
+            batch_from_prior, _ = decoder(z_from_prior)
 
             if "adversarial" in train_params["reconstructions"]:
                 # From:
@@ -499,7 +503,7 @@ class Train(Trainable):
                 z_from_prior = nn.sample_from_prior(
                     nn_architecture["latent_dim"], n_samples=n_batch_data
                 ).to(DEVICE)
-                batch_from_prior, scale_b_from_prior = decoder(z_from_prior)
+                batch_from_prior, _ = decoder(z_from_prior)
 
                 if "adversarial" in train_params["reconstructions"]:
                     discriminator = self.modules["discriminator_reconstruction"]
@@ -669,8 +673,9 @@ class Train(Trainable):
                 output=output, module_name=module_name, module=module, epoch_id=epoch_id
             )
 
+    @staticmethod
     def print_train_logs(
-        self,
+        # self,
         epoch,
         batch_idx,
         n_batches,
@@ -685,7 +690,7 @@ class Train(Trainable):
         dgex=0,
         dgz=0,
     ):
-
+        """print_train_logs"""
         loss = loss / n_batch_data
         loss_reconstruction = loss_reconstruction / n_batch_data
         loss_regularization = loss_regularization / n_batch_data

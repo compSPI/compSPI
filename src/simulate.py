@@ -214,10 +214,12 @@ def simulate_atoms(
         n_particles : int
             number of particles to simulate
         sigma : float
-            spread of Gaussian blob of atom. atomic B-factor. in units of pixels (not angstroms)
+            spread of Gaussian blob of atom. atomic B-factor.
+            in units of pixels (not angstroms)
             # TODO: extend to have per atom sigmas (and n_trunc)
         n_trunc : int
-            size of patch around Gaussian blob, outside of which the Gaussian is truncated to zero. Reasonable value of int(6*sigma), because gaussian near zero 3 sigma away from mean
+            size of patch around Gaussian blob, outside of which the Gaussian is truncated to zero.
+            Reasonable value of int(6*sigma), because gaussian near zero 3 sigma away from mean
         snr : float
             signal to noise ratio. defined as the std(signal) / std(noise). the signal is the projections (with ctf if that's included)
         do_snr : bool
