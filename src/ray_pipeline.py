@@ -130,7 +130,6 @@ class Config(object):
 
 class Train(Trainable):
     """class Train"""
-
     def _setup(self, config):
 
         if not WITH_RAY:

@@ -1,5 +1,5 @@
-import numpy as np
 import numba as nb
+import numpy as np
 
 
 def ctf_freqs(N, psize=1.0, d=2):
