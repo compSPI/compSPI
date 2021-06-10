@@ -14,13 +14,14 @@ DEVICE = torch.device("cuda" if CUDA else "cpu")
 
 
 def load_checkpoint(output, algo_name="vae", epoch_id=None):
+    """load_checkpoint"""
     if epoch_id is None:
         ckpts = glob.glob("%s/train_%s/epoch_*_checkpoint.pth" % (output, algo_name))
         if len(ckpts) == 0:
             raise ValueError("No checkpoints found.")
         else:
             ckpts_ids_and_paths = [(int(f.split("_")[-2]), f) for f in ckpts]
-            ckpt_id, ckpt_path = max(ckpts_ids_and_paths, key=lambda item: item[0])
+            _, ckpt_path = max(ckpts_ids_and_paths, key=lambda item: item[0])
     else:
         # Load module corresponding to epoch_id
         ckpt_path = "%s/train_%s/epoch_%d_checkpoint.pth" % (
@@ -38,6 +39,7 @@ def load_checkpoint(output, algo_name="vae", epoch_id=None):
 
 
 def load_module(output, module_name="encoder", epoch_id=None):
+    """load_module"""
     ckpt = load_checkpoint(output=output, epoch_id=epoch_id)
     nn_architecture = ckpt["nn_architecture"]
     nn_type = nn_architecture["nn_type"]
@@ -184,14 +186,28 @@ def latent_projection_old(output, dataset_path, epoch_id=None):
 ##########
 
 
-def reconstruction(output, z, algo_name="vae", epoch_id=None):
+def reconstruction(
+    output,
+    z,
+    # algo_name='vae',
+    epoch_id=None,
+):
+    """Reconstruction"""
     decoder = load_module(output, module_name="decoder", epoch_id=epoch_id)
     recon, _ = decoder(z)
     recon = recon.cpu().detach().numpy()
     return recon
 
 
-def reconstruction_old(output, z, algo_name="vae", epoch_id=None):
+def reconstruction_old(
+    output,
+    z,
+    # algo_name='vae',
+    epoch_id=None,
+):
+    """
+    reconstruction_old
+    """
     decoder = load_module_old(output, module_name="decoder", epoch_id=epoch_id)
     recon, _ = decoder(z)
     recon = recon.cpu().detach().numpy()
