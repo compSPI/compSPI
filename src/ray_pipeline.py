@@ -68,6 +68,7 @@ DATA_DIM = functools.reduce((lambda x, y: x * y), IMG_SHAPE)
 LATENT_DIM = 3
 NN_TYPE = 'conv_orig'
 assert NN_TYPE in ['toy', 'fc', 'conv', 'conv_plus', 'conv_orig']
+SPD = None
 
 NN_ARCHITECTURE = {
     'img_shape': IMG_SHAPE,
@@ -127,7 +128,8 @@ class Config(object):
         return self.search_space[arg]
 
 class Train(Trainable):
-
+    """ class Train
+    """
     def _setup(self, config):
 
         if not WITH_RAY:
@@ -210,7 +212,7 @@ class Train(Trainable):
         eg. encoder, decoder, discriminator, depending on the architecture
         - optimizers: a dict with optimizers corresponding to each module.
         """
-        
+
         start = time.time()
 
         epoch = self._iteration
@@ -263,7 +265,7 @@ class Train(Trainable):
             z_from_prior = nn.sample_from_prior(
                 nn_architecture['latent_dim'],
                 n_samples=n_batch_data).to(DEVICE)
-            batch_from_prior, scale_b_from_prior = decoder(
+            batch_from_prior, _ = decoder(
                 z_from_prior)
 
             if 'adversarial' in train_params['reconstructions']:
@@ -494,7 +496,7 @@ class Train(Trainable):
                 z_from_prior = nn.sample_from_prior(
                     nn_architecture['latent_dim'],
                     n_samples=n_batch_data).to(DEVICE)
-                batch_from_prior, scale_b_from_prior = decoder(
+                batch_from_prior, _ = decoder(
                     z_from_prior)
 
                 if 'adversarial' in train_params['reconstructions']:
@@ -673,7 +675,8 @@ class Train(Trainable):
                          loss_reconstruction, loss_regularization,
                          loss_discriminator=0, loss_generator=0,
                          dx=0, dgex=0, dgz=0):
-
+        """ print_train_logs
+        """
         loss = loss / n_batch_data
         loss_reconstruction = loss_reconstruction / n_batch_data
         loss_regularization = loss_regularization / n_batch_data

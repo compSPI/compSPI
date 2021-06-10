@@ -12,7 +12,7 @@ def visualize_simple(dataset, reconstruction,
               metadata1, metadata2,
               iframe=0, markersize=24,
               cmap1=None, cmap2=None,
-              show_3dpsd=True, show_1dpsd=True,
+              #show_3dpsd=True, show_1dpsd=True,
               figname=''):
     """
     """
@@ -27,7 +27,7 @@ def visualize_simple(dataset, reconstruction,
     n_col=2
     data_image     = dataset[iframe,0,...]
     reconstructed = reconstruction[iframe,0,...]
-    ### START FIGURE 
+    ### START FIGURE
     fig = plt.figure(figsize=(width,height), dpi=180)
     #
     plt.subplot(n_row,n_col,1)
@@ -37,7 +37,7 @@ def visualize_simple(dataset, reconstruction,
                 axis='both',          # changes apply to the x-axis
                 which='both',      # both major and minor ticks are affected
                 bottom=False,      # ticks along the bottom edge are off
-                top=False, 
+                top=False,
                 left=False, # ticks along the top edge are off
                 labelleft=False,
                 labelbottom=False) # labels along the bottom edge ar
@@ -53,7 +53,7 @@ def visualize_simple(dataset, reconstruction,
                 axis='both',          # changes apply to the x-axis
                 which='both',      # both major and minor ticks are affected
                 bottom=False,      # ticks along the bottom edge are off
-                top=False, 
+                top=False,
                 left=False, # ticks along the top edge are off
                 labelleft=False,
                 labelbottom=False) # labels along the bottom edge ar
@@ -70,7 +70,7 @@ def visualize_simple(dataset, reconstruction,
                 axis='both',          # changes apply to the x-axis
                 which='both',      # both major and minor ticks are affected
                 bottom=False,      # ticks along the bottom edge are off
-                top=False, 
+                top=False,
                 left=False, # ticks along the top edge are off
                 labelleft=False,
                 labelbottom=False) # labels along the bottom edge ar
@@ -81,7 +81,7 @@ def visualize_simple(dataset, reconstruction,
                 axis='both',          # changes apply to the x-axis
                 which='both',      # both major and minor ticks are affected
                 bottom=False,      # ticks along the bottom edge are off
-                top=False, 
+                top=False,
                 left=False, # ticks along the top edge are off
                 labelleft=False,
                 labelbottom=False) # labels along the bottom edge ar
@@ -110,7 +110,7 @@ def visualize(dataset, reconstruction,
     data_image     = dataset[iframe,0,...]
     reconstructed = reconstruction[iframe,0,...]
 
-    ### START FIGURE 
+    ### START FIGURE
     fig = plt.figure(figsize=(width,height), dpi=180)
     #
     plt.subplot(n_row,2,1)
@@ -147,7 +147,7 @@ def visualize(dataset, reconstruction,
         plt.plot(radial_profile(psd(data_image)), color='black', linewidth=1, linestyle='dashed')
         plt.xlim(0,data_image.shape[0]/2)
         plt.ylim(np.min(data_image_1dpsd),np.max(data_image_1dpsd))
-        i_subplot=6   
+        i_subplot=6
     #
     if show_3dpsd:
         plt.subplot(3,3,i_subplot+1)
@@ -168,9 +168,11 @@ def visualize(dataset, reconstruction,
 
 def show_latentspace(mus, metadata,
                      do_pca=False,
-                     label0='', label1='', 
+                     label0='', label1='',
                      figsize=10, dpi=180, fontsize=18,
                      figname=''):
+    """ show_latentspace
+    """
     proj = mus
     if do_pca:
         U, L, Vt = np.linalg.svd(mus, full_matrices=False)
@@ -220,12 +222,15 @@ def show_latentspace(mus, metadata,
     plt.show()
     if(figname):
         fig.savefig(figname)
- 
+
 def show_latentspace_v2(mus, metadata,
                      do_pca=False,
-                     label0='', label1='',
+                     #label0='',
+                     label1='',
                      figsize=10, dpi=180, fontsize=18,
                      figname=''):
+    """ show_latentspace_v2
+    """
     proj = mus
     if do_pca:
         U, L, Vt = np.linalg.svd(mus, full_matrices=False)
@@ -240,7 +245,6 @@ def show_latentspace_v2(mus, metadata,
     plt.grid(which='major')
     plt.tick_params(labelbottom=False, labelleft=False)
     plt.scatter(proj[:,0], proj[:,1], c=metadata[:,1], cmap='twilight')
-    #cbar = plt.colorbar(ticks=[np.min(metadata[:,1]), np.mean(metadata[:,1]), np.max(metadata[:,1])])
     cbar = plt.colorbar(ticks=[-180, 180])
     cbar.set_label(label1, rotation=270)
     #
@@ -250,7 +254,6 @@ def show_latentspace_v2(mus, metadata,
     plt.grid()
     plt.tick_params(labelbottom=False, labelleft=False)
     plt.scatter(proj[:,0], proj[:,1], c=metadata[:,0], cmap='rainbow')
-    #cbar = plt.colorbar(ticks=[np.min(metadata[:,0]), np.mean(metadata[:,0]), np.max(metadata[:,0])])
     cbar = plt.colorbar(ticks=[0,3])
     cbar.set_label(label1, rotation=270)
     plt.tight_layout()
@@ -280,7 +283,7 @@ def show_reconstruction(recon, dataset=None, iframe=0):
         psddiff = psd(dataset[iframe,0,...]-recon[iframe,0,...])
         plt.imshow(psddiff ,cmap='Greys_r')
         plt.tight_layout()
-        
+
 def psd(data):
     """
     """
@@ -363,7 +366,9 @@ def biplot_histncontour(x,y,bins=150,levels=[1,3,5]):
     """
     fig = plt.figure(figsize=(18,9))
     plt.subplot(121)
-    counts,xbins,ybins,image = plt.hist2d(x,y,bins=bins,norm=LogNorm(), cmap = plt.cm.inferno)
+    counts, xbins, ybins, _ = plt.hist2d(
+        x,y,bins=bins,norm=LogNorm(), cmap = plt.cm.inferno
+    )
     plt.colorbar()
     plt.subplot(122)
     plt.contourf(np.log10(counts.transpose()), extent=[xbins[0],xbins[-1],ybins[0],ybins[-1]],cmap = plt.cm.Greys, levels=levels)
@@ -448,7 +453,7 @@ def biplots(prj,prj2=None,
                                        labelbottom=False,labeltop=False,labelleft=False,labelright=False,                                       labelsize='large')
                         colorbar = c #range(1,np.max(c)+1,1)
                         ax.scatter(colorbar, colorbar, c=colorbar, cmap=cmap, s=colorbar_size)#vmin=1, vmax=np.max(c), cmap=cmap)
-                        #for x in [np.min(c),np.mean(c),np.max(c)]: 
+                        #for x in [np.min(c),np.mean(c),np.max(c)]:
                             #ax.annotate('{0:.1f}'.format(x),(x+np.std(x),x))
                     if(i==(n-1) and c2 is not None):
                         ax = fig.add_subplot(gs[i,j])
@@ -462,8 +467,8 @@ def biplots(prj,prj2=None,
                                        labelbottom=False,labeltop=False,labelleft=False,labelright=False,                                       labelsize='large')
                         colorbar = c2 #range(1,np.max(c)+1,1)
                         ax.scatter(colorbar, colorbar, c=colorbar, cmap=c2map, s=colorbar_size)#vmin=1, vmax=np.max(c), cmap=cmap)
-                        #for x in [np.min(c2),np.mean(c2),np.max(c2)]: 
-                            #ax.annotate('{0:.1f}'.format(x),(x+np.std(x),x)) 
+                        #for x in [np.min(c2),np.mean(c2),np.max(c2)]:
+                            #ax.annotate('{0:.1f}'.format(x),(x+np.std(x),x))
             else:
                 if prj2 is not None:
                     ax = biplot_axis(n,i,j,gs,fig,labels,
@@ -479,6 +484,8 @@ def biplots(prj,prj2=None,
         fig.savefig(figname)
 
 def biplot_c(c,c2,cmap,c2map,plottype,plottype2):
+    """ biplot_c
+    """
     if c is not None:
         plottype='scatter'
     if c2 is not None:
@@ -501,13 +508,15 @@ def biplot_c(c,c2,cmap,c2map,plottype,plottype2):
     return cmap,c2map,plottype,plottype2
 
 def biplot_size(figsize,n):
+    """ biplot_size
+    """
     if(figsize < 0 ):
         if(n == 1):
             figsize=1
         else:
             figsize=4
     figsize=figsize*6
-    nrow = n 
+    nrow = n
     ncol = n
     return figsize,nrow,ncol
 
@@ -519,6 +528,8 @@ def biplot_axis(n,i,j,gs,fig,labels,
                 linewidth=2.5,
                 plottype='scatter', scatter_size=None,
                 x_range=None, y_range=None):
+    """ biplot_axis
+    """
     minorticklocator = MultipleLocator(minortick)
     majorticklocator = MultipleLocator(majortick)
     ax = fig.add_subplot(gs[i,j])
@@ -542,18 +553,10 @@ def biplot_axis(n,i,j,gs,fig,labels,
     if(i == 0 and j != n-1):
         ax.set_xlabel(labels[j],fontsize='xx-large')
         ax.xaxis.set_label_position('top')
-        if(j==1):
-            ax.tick_params(axis='both', which='both',
-                           bottom=False,top=False,left=False,right=False,
-                           labelbottom=False,labeltop=False,labelleft=False,labelright=False,
-                           #bottom=False,top=False,left=True,right=False,
-                           #labelbottom=False,labeltop=False,labelleft=True,labelright=False,
-                           labelsize='large')
-        else:
-            ax.tick_params(axis='both', which='both',
-                           bottom=False,top=False,left=False,right=False,
-                           labelbottom=False,labeltop=False,labelleft=False,labelright=False,
-                           labelsize='large')
+        ax.tick_params(axis='both', which='both',
+                       bottom=False,top=False,left=False,right=False,
+                       labelbottom=False,labeltop=False,labelleft=False,labelright=False,
+                       labelsize='large')
     elif(i == 0 and j == n-1):
         ax.set_xlabel(labels[j],fontsize='xx-large')
         ax.xaxis.set_label_position('top')
@@ -639,10 +642,5 @@ def plot_roc_curve(mus, Zscore, Zscore_set,
     plt.plot([0, 1], [0, 1], color='grey', lw=1, linestyle=':')
     plt.legend(labels, loc=0, fontsize='xx-large')
     plt.grid()
-    if figname:    
+    if figname:
         fig.savefig(figname)
-
-
-
-
-

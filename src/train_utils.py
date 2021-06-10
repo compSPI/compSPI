@@ -199,7 +199,7 @@ def init_training(train_dir, nn_architecture, train_params):
     else:
         ckpts_ids_and_paths = [
             (int(f.split('_')[-2]), f) for f in ckpts]
-        ckpt_id, ckpt_path = max(
+        _, ckpt_path = max(
             ckpts_ids_and_paths, key=lambda item: item[0])
         logging.info('Found checkpoints. Initializing with %s.' % ckpt_path)
         if torch.cuda.is_available():
@@ -226,6 +226,8 @@ def init_training(train_dir, nn_architecture, train_params):
 def save_checkpoint(epoch, modules, optimizers, dir_path,
                     train_losses_all_epochs, val_losses_all_epochs,
                     nn_architecture, train_params):
+    """ save_checkpoint
+    """
     checkpoint = {}
     for module_name in modules.keys():
         module = modules[module_name]
@@ -252,7 +254,7 @@ def load_checkpoint(output, epoch_id=None):
             raise ValueError('No checkpoints found.')
         else:
             ckpts_ids_and_paths = [(int(f.split('_')[-2]), f) for f in ckpts]
-            ckpt_id, ckpt_path = max(
+            _, ckpt_path = max(
                 ckpts_ids_and_paths, key=lambda item: item[0])
     else:
         # Load module corresponding to epoch_id

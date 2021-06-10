@@ -118,7 +118,11 @@ def get_datasets(dataset_name, frac_val=FRAC_VAL, batch_size=8,img_shape=None,nn
     return train_dataset, val_dataset
 
 
-def split_dataset(dataset, frac_val=FRAC_VAL,labels_path=None, save=False, data_dir=None):
+def split_dataset(dataset,
+                  frac_val=FRAC_VAL):
+                  #labels_path=None,
+                  #save=False,
+                  #data_dir=None):
     length = len(dataset)
     train_length = int((1 - frac_val) * length)
     train_dataset = dataset[:train_length]
@@ -187,6 +191,9 @@ def r_pearson_from_z_score(mat):
 
 
 def get_dataset_mnist(img_shape_no_channel=(28, 28)):
+    # TO CHECK
+    NEURO_TRAIN_VAL_DIR = None
+    # TO CHECK
     shape_str = get_shape_string(img_shape_no_channel)
     train_path = os.path.join(
         NEURO_TRAIN_VAL_DIR, 'train_mnist_%s.npy' % shape_str)
@@ -244,6 +251,9 @@ def get_dataset_mnist(img_shape_no_channel=(28, 28)):
 
 
 def get_dataset_cryo_sphere(img_shape_no_channel=None, kwargs=KWARGS):
+    # TO CHECK
+    CRYO_TRAIN_VAL_DIR = None
+    # TO CHECK
     shape_str = get_shape_string(img_shape_no_channel)
     cryo_path = os.path.join(
         CRYO_TRAIN_VAL_DIR, 'cryo_%s.npy' % shape_str)
@@ -484,5 +494,3 @@ def get_dataset_cryo_exp_3d(img_shape_no_channel=None, kwargs=KWARGS):
 
     dataset = torch.Tensor(dataset)
     return dataset
-
-
