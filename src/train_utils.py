@@ -194,7 +194,7 @@ def init_training(train_dir, nn_architecture, train_params):
     ckpts = glob.glob(path_base)
     if len(ckpts) == 0:
         weights_init = train_params["weights_init"]
-        logging.info("No checkpoints found. Initializing with %s." % weights_init)
+        logging.info("No checkpoints found. Initializing with %s.", weights_init)
 
         for module_name, module in modules.items():
             if nn_architecture["nn_type"] == "toy":

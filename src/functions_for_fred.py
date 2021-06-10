@@ -39,6 +39,8 @@ def load_checkpoint(output, algo_name="vae", epoch_id=None):
 
 
 def load_module(output, module_name="encoder", epoch_id=None):
+    """ load_module
+    """
     ckpt = load_checkpoint(output=output, epoch_id=epoch_id)
     nn_architecture = ckpt["nn_architecture"]
     nn_type = nn_architecture["nn_type"]
@@ -191,7 +193,7 @@ def reconstruction(
     # algo_name='vae',
     epoch_id=None,
 ):
-    """reconstruction"""
+    """Reconstruction"""
     decoder = load_module(output, module_name="decoder", epoch_id=epoch_id)
     recon, _ = decoder(z)
     recon = recon.cpu().detach().numpy()

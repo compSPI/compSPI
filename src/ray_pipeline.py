@@ -165,8 +165,8 @@ class Train(Trainable):
             class_2d=train_params["class_2d"],
         )
 
-        logging.info("Train: %s" % train_utils.get_logging_shape(train_dataset))
-        logging.info("Val: %s" % train_utils.get_logging_shape(val_dataset))
+        logging.info("Train: %s", train_utils.get_logging_shape(train_dataset))
+        logging.info("Val: %s", train_utils.get_logging_shape(val_dataset))
 
         logging.info("NN architecture: ")
         logging.info(nn_architecture)
@@ -672,6 +672,7 @@ class Train(Trainable):
                 output=output, module_name=module_name, module=module, epoch_id=epoch_id
             )
 
+    @staticmethod
     def print_train_logs(
         self,
         epoch,

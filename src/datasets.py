@@ -62,8 +62,11 @@ def get_datasets(
     train_params=None,
     synthetic_params=None,
     class_2d=None,
-    kwargs=KWARGS,
+    kwargs=None,
 ):
+
+    if kwargs is None:
+        kwargs=KWARGS
 
     img_shape_no_channel = None
     if img_shape is not None:
@@ -258,7 +261,9 @@ def get_dataset_mnist(img_shape_no_channel=(28, 28)):
     return train_dataset, val_dataset
 
 
-def get_dataset_cryo_sphere(img_shape_no_channel=None, kwargs=KWARGS):
+def get_dataset_cryo_sphere(img_shape_no_channel=None, kwargs=None):
+    if kwargs is None:
+        kwargs=KWARGS
     # TO CHECK
     CRYO_TRAIN_VAL_DIR = None
     # TO CHECK
@@ -421,7 +426,9 @@ def get_dataset_cryo_exp(img_shape_no_channel=None, kwargs=KWARGS):
 
 
 def get_dataset_cryo_exp_class_2d(
-    img_shape_no_channel=None, class_2d=None, kwargs=KWARGS
+    img_shape_no_channel=None,
+    class_2d=None,
+    #kwargs=KWARGS
 ):
     CRYO_TRAIN_VAL_DIR = os.path.join(CRYO_DIR, "train_val_datasets")
     shape_str = get_shape_string(img_shape_no_channel)
