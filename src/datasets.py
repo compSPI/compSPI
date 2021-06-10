@@ -99,7 +99,7 @@ def get_datasets(
         dataset = get_dataset_cryo_exp(img_shape_no_channel, kwargs)
         train_dataset, val_dataset = split_dataset(dataset)
     elif dataset_name == "cryo_exp_class_2d":
-        dataset = get_dataset_cryo_exp_class_2d(img_shape_no_channel, class_2d, kwargs)
+        dataset = get_dataset_cryo_exp_class_2d(img_shape_no_channel, class_2d) #, kwargs)
         train_dataset, val_dataset = split_dataset(dataset)
     elif dataset_name == "cryo_exp_3d":
         dataset = get_dataset_cryo_exp_3d(img_shape_no_channel, kwargs)

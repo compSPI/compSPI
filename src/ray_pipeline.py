@@ -674,7 +674,7 @@ class Train(Trainable):
 
     @staticmethod
     def print_train_logs(
-        self,
+        #self,
         epoch,
         batch_idx,
         n_batches,
