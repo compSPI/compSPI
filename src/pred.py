@@ -41,7 +41,7 @@ def pred3d(
     # defocus_true,
     defocus_min=0.5,
     defocus_max=2.5,
-    #do_ellipse=False,
+    # do_ellipse=False,
 ):
     """ """
     #
