@@ -1,10 +1,11 @@
 import numpy as np
 import pandas as pd
 from scipy.ndimage import map_coordinates
+
 import coords
 import fourier
-import transfer
 import gauss_forward_model
+import transfer
 
 
 def simulate_slice(
@@ -221,7 +222,7 @@ def simulate_atoms(
             Reasonable value of int(6*sigma), because gaussian near zero 3 sigma away from mean
         snr : float
             signal to noise ratio. defined as the std(signal) / std(noise). the signal is the projections (with ctf if that's included)
-        do_snr : bool 
+        do_snr : bool
             add nosie when True
         do_ctf : bool
             add ctf when True
@@ -265,7 +266,9 @@ def simulate_atoms(
     n_atoms = atoms.shape[-1]
     assert N % 2 == 0, "even pixel length"
 
-    xy = coords.coords_n_by_d(np.arange(-N // 2, N // 2), d=2) # in pixel units, not angstroms
+    xy = coords.coords_n_by_d(
+        np.arange(-N // 2, N // 2), d=2
+    )  # in pixel units, not angstroms
     if n_trunc is None:
         n_trunc = round(6 * sigma)
 
