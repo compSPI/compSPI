@@ -1,3 +1,5 @@
+[![DeepSource](https://deepsource.io/gh/compSPI/compSPI.svg/?label=active+issues&show_trend=true&token=9LHN59PF7zfVd3LsC89oH129)](https://deepsource.io/gh/compSPI/compSPI/?ref=repository-badge)
+
 # compSPI
 Computational Single Particle Imager.
 
@@ -21,7 +23,7 @@ mpiexec -n 16 python cspi_generate_synthetic_dataset_mpi_hybrid.py --config cspi
 
 ### Step 2. Mix datasets
 
-We use [LatentSpaceBuilder](https://github.com/compSPI/LatentSpaceBuilder) to mix previously generated datasets. 
+We use [LatentSpaceBuilder](https://github.com/compSPI/LatentSpaceBuilder) to mix previously generated datasets.
 
 | type | script | input |
 | ---- | ------ | ----- |
@@ -38,7 +40,7 @@ We use [LatentSpaceBuilder](https://github.com/compSPI/LatentSpaceBuilder) to do
 
 | type | script | input |
 | ---- | ------ | ----- |
-| downsampled | [incremental_pca_downsampling_featurization_mpi.py](https://github.com/compSPI/LatentSpaceBuilder/blob/master/latent_space_builder/incremental_pca_downsampling_featurization_mpi.py) | [incremental-pca-downsampling-featurization-mpi.json](https://github.com/compSPI/LatentSpaceBuilder/blob/master/latent_space_builder/incremental-pca-downsampling-featurization-mpi.json) 
+| downsampled | [incremental_pca_downsampling_featurization_mpi.py](https://github.com/compSPI/LatentSpaceBuilder/blob/master/latent_space_builder/incremental_pca_downsampling_featurization_mpi.py) | [incremental-pca-downsampling-featurization-mpi.json](https://github.com/compSPI/LatentSpaceBuilder/blob/master/latent_space_builder/incremental-pca-downsampling-featurization-mpi.json)
 
 To downsample a dataset, follow the instructions in the script itself. For example:
 ```bash
@@ -63,5 +65,3 @@ python flag_downsampled_diffraction_patterns_with_incremental_pca.py --config fl
 We use [LatentSpaceVisualizer](https://github.com/compSPI/LatentSpaceVisualizer) to visualize a labelled or unlabelled dataset.
 
 Follow the instructions in the [Jupyter notebook](https://github.com/compSPI/LatentSpaceVisualizer/blob/master/latent_space_visualizer.ipynb).
-
-
