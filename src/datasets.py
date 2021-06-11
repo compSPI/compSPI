@@ -14,8 +14,6 @@ import numpy as np
 import pandas as pd
 import torch
 import torch.utils
-
-
 # from geomstats.geometry.spd_matrices_space import SPDMatricesSpace
 from skimage import transform
 from torchvision import datasets, transforms
@@ -42,7 +40,7 @@ CRYO_H5 = os.path.join(
     "/gpfs/slac/cryo/fs1/g/ML/vaegan/datasets", "exp/20181005-rib-TEM4/Sort"
 )
 
-CRYO_TRAIN_VAL_DIR = os.path.join(CRYO_DIR, 'train_val_datasets')
+CRYO_TRAIN_VAL_DIR = os.path.join(CRYO_DIR, "train_val_datasets")
 
 CORR_THRESH = 0.1
 GAMMA = 1.0
