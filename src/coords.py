@@ -30,11 +30,11 @@ def deg_to_rad(deg):
     return deg * np.pi / 180
 
 
-def get_random_quat(num_pts,method = 'sphere'):
+def get_random_quat(num_pts, method="sphere"):
     """
     Get num_pts of unit quaternions with a uniform random distribution.
     :param num_pts: The number of quaternions to return
-    : param method: 
+    : param method:
       hemisphere: uniform on the 4 hemisphere, with x in [0,1], y,z in [-1,1]
       sphere: uniform on the sphere, with x,y,z in [-1,1]
     :return: Quaternion list of shape [number of quaternion, 4]
@@ -43,13 +43,13 @@ def get_random_quat(num_pts,method = 'sphere'):
     u1, u2, u3 = [u[x] for x in range(3)]
 
     quat = np.zeros((4, num_pts))
-    if method == 'hemisphere':
-      angle = np.pi / 2
-    elif method == 'sphere':
-      angle = 2 * np.pi
+    if method == "hemisphere":
+        angle = np.pi / 2
+    elif method == "sphere":
+        angle = 2 * np.pi
     else:
-      assert False, 'use hemisphere or sphere'
-    
+        assert False, "use hemisphere or sphere"
+
     quat[0] = np.sqrt(1 - u1) * np.sin(angle * u2)
     quat[1] = np.sqrt(1 - u1) * np.cos(angle * u2)
     quat[2] = np.sqrt(u1) * np.sin(angle * u3)
