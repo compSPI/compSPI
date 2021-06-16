@@ -11,7 +11,9 @@ This is compSPI central repo. Satellite repos can be found in the [compSPI organ
 
 ## Shared bibliography
 
-We are maintaining the [Zotero group compSPI](https://www.zotero.org/groups/4309765/compspi). See some tips on how to contribute to it and integrate it in your Overleaf project [here](https://github.com/compspi/compspi/blob/master/docs/reference_management.rst). 
+We are maintaining the [Zotero group compSPI](https://www.zotero.org/groups/4309765/compspi). 
+
+See some tips on how to contribute to it and integrate it in your Overleaf project [here](https://github.com/compspi/compspi/blob/master/docs/reference_management.rst). 
 
 ## Contributing
 
