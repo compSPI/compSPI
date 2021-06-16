@@ -3,4 +3,6 @@
 # compSPI
 Computational Single Particle Imaging
 
+## Contributing
 
+See our [contributing](https://github.com/compspi/compspi/blob/master/docs/contributing.rst) guidelines!
