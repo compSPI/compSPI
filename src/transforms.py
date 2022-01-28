@@ -12,8 +12,8 @@ def primal_to_fourier_2D(r):
     out: torch.Tensor
         Tensor of size (batch,1, size,size)
     """
-    r = torch.fft.ifftshift(r, dim=(-2, -1))
-    return torch.fft.fftshift(
+    r = torch.fft.fftshift(r, dim=(-2, -1))
+    return torch.fft.ifftshift(
         torch.fft.fftn(r, s=(r.shape[-2], r.shape[-1]), dim=(-2, -1)), dim=(-2, -1)
     )
 
