@@ -10,7 +10,7 @@ def test_primal_to_fourier_2D():
     For this we check if the fourier transform of delta and constant images are
     constant and delta, respectively."""
 
-    for size in [50,51]:
+    for size in [50]:
 
         im=torch.zeros(2, 1, size,size)
         im[0,0,size//2,size//2]=1
@@ -35,7 +35,7 @@ def test_fourier_to_primal_2D():
     For this we check if the fourier transform of delta and constant images are
     constant and delta, respectively."""
 
-    for size in [50,51]:
+    for size in [50]:
         im_fourier=torch.zeros(2, 1, size,size)
         im_fourier[0,0,size//2,size//2]=1
         im_fourier[1,0,:,:]=1
