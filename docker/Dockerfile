@@ -4,7 +4,6 @@ MAINTAINER Frederic Poitevin "fpoitevi@stanford.edu"
 
 WORKDIR /work
 
-
 # Install useful packages
 RUN apt-get -y update && \
     apt-get -y install git wget vim emacs tmux screen unzip build-essential && \
