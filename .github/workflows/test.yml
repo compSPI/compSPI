@@ -1,0 +1,42 @@
+name: "Test"
+
+on:
+  push:
+    branches: [master,github-actions-test,cleanup]
+    paths-ignore:
+    - 'README.md'
+    - '.deepsource.toml'
+    - '.gitignore'
+    - 'setup.py'
+
+  pull_request:
+    branches: [master]
+    paths-ignore:
+    - 'README.md'
+    - '.deepsource.toml'
+    - '.gitignore'
+    - 'setup.py'
+
+
+jobs:
+  build:
+
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Check Out Repo
+        uses: actions/checkout@v2
+
+      - name: dryrun
+        uses: ./tests/
+        id: dryrun
+
+      - name: unit testing [pytest]
+        uses: ./tests/
+        id: testing
+        with:
+          command: |
+            pytest --cov-report term --cov-report xml:coverage.xml --cov=compSPI tests
+
+      - name: uploading code coverage [codecov]
+        run: |
+          bash <(curl -s https://codecov.io/bash) -c

@@ -1,0 +1,6 @@
+[flake8]
+docstring-convention = numpy
+import_order_style = smarkets
+max-line-length = 88
+extend-ignore = E203,I202,I100
+exclude = compSPI/__init__.py,tests/__init__.py
