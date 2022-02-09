@@ -1,0 +1,19 @@
+coverage:
+  round: up
+  precision: 2
+  status:
+    patch:
+      default:
+        # basic
+        target: 90%
+        threshold: 2%
+        base: auto
+        flags:
+          - unit
+        # advanced
+        branches:
+          - master
+        if_no_uploads: error
+        if_not_found: error
+        if_ci_failed: error
+        only_pulls: false

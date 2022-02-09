@@ -2,8 +2,6 @@ FROM docker.io/ubuntu:18.04
 
 MAINTAINER Frederic Poitevin "fpoitevi@stanford.edu"
 
-VOLUME ["/tmp"]
-
 WORKDIR /work
 
 # Install useful packages
