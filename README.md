@@ -1,3 +1,6 @@
+[![Test](https://github.com/compSPI/simSPI/actions/workflows/test.yml/badge.svg)](https://github.com/compSPI/compSPI/actions/workflows/test.yml)
+[![Lint](https://github.com/compSPI/simSPI/actions/workflows/lint.yml/badge.svg)](https://github.com/compSPI/compSPI/actions/workflows/lint.yml)
+[![Codecov](https://codecov.io/gh/compSPI/simSPI/branch/master/graph/badge.svg?token=OBVOV3ZM1O)](https://codecov.io/gh/compSPI/compSPI)
 [![DeepSource](https://deepsource.io/gh/compSPI/compSPI.svg/?label=active+issues&show_trend=true&token=9LHN59PF7zfVd3LsC89oH129)](https://deepsource.io/gh/compSPI/compSPI/?ref=repository-badge)
 
 # compSPI
