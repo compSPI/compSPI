@@ -1,10 +1,13 @@
 """contain functions dealing with probability distributions."""
 
+
 def uniform_to_triangular(x):
     """Convert samples from uniform distribution to triangular distribution.
+
     Parameters
     ----------
     x: torch.Tensor
+
     Returns
     -------
     out: torch.Tensor
