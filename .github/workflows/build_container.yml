@@ -1,0 +1,80 @@
+name: "Building compSPI Container"
+
+on:
+  push:
+    branches: [master, github-actions-test, cleanup]
+    paths:
+      - 'docker/Dockerfile'
+      - 'docker/entrypoint.sh'
+      - 'environment.yml'
+      - 'setup.py'
+      - '.github/workflows/build_container.yml'
+
+  pull_request:
+    branch: [master]
+    paths:
+      - 'docker/Dockerfile'
+      - 'docker/entrypoint.sh'
+      - 'environment.yml'
+      - 'setup.py'
+      - '.github/workflows/build_container.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Check Out Repo
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Build and push test
+        id: docker_test_build
+        uses: docker/build-push-action@v2
+        with:
+          context: ./
+          file: ./docker/Dockerfile
+          builder: ${{ steps.buildx.outputs.name }}
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/compspi:test
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+
+      - name: unit testing [pytest]
+        uses: ./docker/
+        id: testing
+        with:
+          command: |
+            pytest --cov-report term --cov-report xml:coverage.xml --cov=compSPI tests
+
+      - name: Build and push validated
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: ./
+          file: ./docker/Dockerfile
+          builder: ${{ steps.buildx.outputs.name }}
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/compspi:latest
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+
+      - name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
