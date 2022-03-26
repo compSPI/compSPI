@@ -1,6 +1,7 @@
 """Test functions for transforms."""
 
 import torch
+
 from compSPI.transforms import fourier_to_primal_2D as ifft_2d
 from compSPI.transforms import fourier_to_primal_3D as ifft_3d
 from compSPI.transforms import primal_to_fourier_2D as fft_2d
@@ -13,7 +14,7 @@ def test_primal_to_fourier_2D():
     For this we check if the fourier transform of delta and constant images are
     constant and delta, respectively.
     """
-    for size in [50]:
+    for size in [32]:
 
         im = torch.zeros(2, 1, size, size)
         im[0, 0, size // 2, size // 2] = 1
@@ -38,7 +39,8 @@ def test_fourier_to_primal_2D():
     For this we check if the fourier transform of delta and constant images are
     constant and delta, respectively.
     """
-    for size in [50]:
+    for size in [32]:
+
         im_fourier = torch.zeros(2, 1, size, size)
         im_fourier[0, 0, size // 2, size // 2] = 1
         im_fourier[1, 0, :, :] = 1
@@ -59,7 +61,7 @@ def test_primal_to_fourier_3D():
     For this we check if the fourier transform of delta and constant images are
     constant and delta, respectively.
     """
-    for size in [50]:
+    for size in [32]:
 
         im = torch.zeros(2, size, size, size)
         im[0, size // 2, size // 2, size // 2] = 1
@@ -84,7 +86,8 @@ def test_fourier_to_primal_3D():
     For this we check if the fourier transform of delta and constant images are
     constant and delta, respectively.
     """
-    for size in [50]:
+    for size in [32]:
+
         im_fourier = torch.zeros(2, size, size, size)
         im_fourier[0, size // 2, size // 2, size // 2] = 1
         im_fourier[1, :, :, :] = 1
