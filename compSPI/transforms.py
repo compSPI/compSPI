@@ -27,12 +27,12 @@ def fourier_to_primal_2D(f):
     Parameters
     ----------
     f: torch.Tensor
-        Tensor of size (batch,1, size,size)
+        Tensor of size (batch, 1, size, size)
 
     Returns
     -------
     out: torch.Tensor
-        Tensor of size (batch,1, size,size)
+        Tensor of size (batch, 1, size, size)
     """
     f = torch.fft.ifftshift(f, dim=(-2, -1))
     return torch.fft.fftshift(
