@@ -1,4 +1,4 @@
-"""contain functions dealing with image transformations."""
+"""Contains functions dealing with image transformations."""
 import torch
 
 
