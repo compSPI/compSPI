@@ -1,8 +1,8 @@
 """Test functions for transforms."""
 
 import torch
-from compSPI.transforms import (fourier_to_primal_2D, fourier_to_primal_3D,
-                                primal_to_fourier_2D, primal_to_fourier_3D)
+from compSPI.transforms import fourier_to_primal_2D, primal_to_fourier_2D
+from compSPI.transforms import fourier_to_primal_3D, primal_to_fourier_3D
 
 
 def test_primal_to_fourier_2D():
