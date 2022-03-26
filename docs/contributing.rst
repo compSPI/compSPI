@@ -69,11 +69,11 @@ feedback:
 - If an exception is raised, please **provide the full traceback**.
 
 - Please include your **operating system type and version number**, as well as
-  your **Python, compspi, numpy, and scipy versions**. This information
+  your **Python, compSPI, numpy, and scipy versions**. This information
   can be found by running the following code snippet::
 
-    >>> import compspi
-    >>> print('compspi', compspi.__version___)
+    >>> import compSPI
+    >>> print('compSPI', compSPI.__version___)
 
 - Please ensure all **code snippets and error messages are formatted in
   appropriate code blocks**.  See `Creating and highlighting code blocks
@@ -89,17 +89,19 @@ Contributing: Code Workflow
   If in doubt about duplicated work, or if you want to work on a non-trivial
   feature, it's recommended to first open an issue in
   the `issue tracker <https://github.com/compspi/compspi/issues>`_
-  to get some feedbacks from core developers.
+  to get some feedback from core developers.
 
 
 Contributing: GitHub Workflow
 =============================
 
-The preferred way to contribute to compspi is to fork the `main
+The preferred way to contribute to compSPI is to fork the `main
 repository <https://github.com/compspi/compspi/>`__ on GitHub,
-then submit a "pull request" (PR).
+then submit a "pull request" (PR). Note that PRs from an external fork
+to compSPI sometimes fail due to authentication issues (Docker in simSPI, OSF in ioSPI,
+and one my need to PR directly from the compSPI fork). See `here <https://github.com/compspi/ioSPI#note-on-pull-requests-from-forks>`_ for more details.
 
-In the first few steps, we explain how to locally install compspi, and
+In the first few steps, we explain how to locally install compSPI, and
 how to set up your git repository:
 
 1. `Create an account <https://github.com/join>`_ on
@@ -111,19 +113,19 @@ how to set up your git repository:
    account on the GitHub user account. For more details on how to fork a
    repository see `this guide <https://help.github.com/articles/fork-a-repo/>`_.
 
-3. Clone your fork of the compspi repo from your GitHub account to your
+3. Clone your fork of the compSPI repo from your GitHub account to your
    local disk::
 
        $ git clone git@github.com:YourLogin/compspi.git
        $ cd compspi
 
 4. Add the ``upstream`` remote. This saves a reference to the main
-   compspi repository, which you can use to keep your repository
+   compSPI repository, which you can use to keep your repository
    synchronized with the latest changes::
 
     $ git remote add upstream https://github.com/compspi/compspi.git
 
-You should now have a working installation of compspi, and your git
+You should now have a working installation of compSPI, and your git
 repository properly configured. The next steps now describe the process of
 modifying code and submitting a PR:
 
@@ -159,7 +161,7 @@ modifying code and submitting a PR:
    mailing list hi@compspi.ai for more visibility.
 
 It is often helpful to keep your local feature branch synchronized with the
-latest changes of the main compspi repository::
+latest changes of the main compSPI repository::
 
     $ git fetch upstream
     $ git rebase upstream/master
@@ -185,61 +187,62 @@ complies with the following rules. The **bolded** ones are especially important:
    good title.
 
 2. **Make sure that your code is** `vectorized
-   <https://www.geeksforgeeks.org/vectorization-in-python/>`_. For vectorized matrix operations we recommend using the
-   methods of the  `Matrices <https://github.com/compspi/compspi/blob/master/compspi/geometry/matrices.py>`_
+   <https://www.geeksforgeeks.org/vectorization-in-python/>`_.
+   For vectorized matrix operations we recommend using the methods of the
+   `Matrices <https://github.com/geomstats/geomstats/blob/master/geomstats/geometry/matrices.py>`_
    class instead of lower level backend functions, as they are automatically vectorized.
 
 3. **Submit your code with associated unit tests**. High-quality
    `unit testing <https://en.wikipedia.org/wiki/Unit_testing>`_
-   is a corner-stone of the compspi development process.
-   The tests are functions appropriately named, located in the `tests`
+   is a corner-stone of the compSPI development process.
+   The tests are functions appropriately named, located in the ``tests``
    subdirectory, that check the validity of the algorithms and the
    different options of the code. For each function `my_fun` that you
-   implement in a given `my_module.py`, you should add the corresponding test
-   function `test_my_fun` in the file `test_my_module.py`. We expect code
+   implement in a given ``my_module.py``, you should add the corresponding test
+   function ``test_my_fun`` in the file ``test_my_module.py``. We expect code
    coverage of new features to be at least 90%, which is automatically verified
-   by the `codecov` software when you submit a PR. You should also add
-   `test_my_fun_vect` tests to ensure that your code is vectorized.
+   by the ``codecov`` software when you submit a PR. You should also add
+   ``test_my_fun_vect`` tests to ensure that your code is vectorized and bug free.
 
 4. **Make sure your code passes all unit tests**. First,
    run the tests related to your changes. For example, if you changed
-   something in `compspi/spd_matrices_space.py`:
+   something in ``compSPI/spd_matrices_space.py``:
 
-   `nose2 --verbose tests.test_spd_matrices_space`
+   ``nose2 --verbose tests.test_spd_matrices_space```
 
    and then run the tests of the whole codebase to check that your feature is
    not breaking any of them:
 
-   `nose2`
+   ``nose2``
 
    This way, further modifications on the code base are granted
    to be consistent with the desired behavior. Merging your PR should not break
-   any test in any backend (numpy, tensorflow or pytorch).
+   any test in any backend (``numpy``, ``tensorflow`` or ``pytorch``).
 
 5. **Make sure that your PR follows Python international style guidelines**,
    `PEP8 <https://www.python.org/dev/peps/pep-0008>`_, which you should read.
-   The `flake8` package automatically checks for style violations when you
-   submit your PR. We recommend installing flake8 with its plugins on your
+   The ``flake8`` package automatically checks for style violations when you
+   submit your PR. We recommend installing ``flake8`` with its plugins on your
    machine by running
 
-   `pip3 install -r dev-requirements.txt`
+   ``pip3 install -r dev-requirements.txt``
 
    Then you can run
 
-   `flake8 compspi tests examples`
+   ``flake8 compSPI tests examples``
 
    To prevent adding commits which fail to adhere to the PEP8 guidelines, we
-   include a `pre-commit <https://pre-commit.com/>` config, which immediately
+   include a `pre-commit <https://pre-commit.com/>`_ config, which immediately
    invokes flake8 on all files staged for commit when running `git commit`. To
    enable the hook, simply run `pre-commit install` after installing
-   `pre-commit` either manually via `pip` or as part of `dev-requirements.txt`.
+   ``pre-commit`` either manually via ``pip`` or as part of ``dev-requirements.txt``.
 
    Please avoid reformatting parts of the file that your pull request doesn't
    change, as it distracts during code reviews.
 
-6. **Make sure that your PR follows compspi coding style and API**,
+6. **Make sure that your PR follows compSPI coding style and API**,
    see our `coding-guidelines`_ below. Ensuring style consistency throughout
-   compspi allows using tools to automatically parse the codebase,
+   compSPI allows using tools to automatically parse the codebase,
    for example searching all instances where a given function is used,
    or use automatic find-and-replace during code's refactorizations. It
    also speeds up the code review and acceptance of PR, as the maintainers
@@ -264,11 +267,11 @@ complies with the following rules. The **bolded** ones are especially important:
 9. PRs should often substantiate the change, through benchmarks of
    performance and efficiency or through examples of usage. Examples also
    illustrate the features and intricacies of the library to users. Have a
-   look at other examples in the `examples/
-   <https://github.com/compspi/compspi/tree/master/examples>`_
+   look at examples in Geomstats' `examples/
+   <https://github.com/geomstats/geomstats/tree/master/examples>`_
    directory for reference. Examples should demonstrate why the new
    functionality is useful in practice and, if possible, compare it to other
-   methods available in compspi.
+   methods available in compSPI.
 
 10. The user guide should also include expected time and space complexity
     of the algorithm and scalability, e.g. "this algorithm can scale to a
@@ -287,7 +290,7 @@ list hi@compspi.ai or on the GitHub issue).
 
 .. note::
 
-  The current state of the compspi code base is not compliant with
+  The current state of the compSPI code base is not compliant with
   all of those guidelines, but we expect that enforcing those constraints
   on all new contributions will get the overall code base quality in the
   right direction.
@@ -334,18 +337,19 @@ underestimate how easy an issue is to solve!
 
 .. topic:: good first issue tag
 
-    A great way to start contributing to compspi is to pick an item from
+    A great way to start contributing to compSPI is to pick an item from
     the list of `good first issues
     <https://github.com/compspi/compspi/labels/good%20first%20issue>`_
     in the issue tracker. Resolving these issues allow you to start contributing
     to the project without much prior knowledge. If you have already contributed
-    to compspi, you should look at Easy issues instead.
+    to compSPI, you should look at
+    `Easy issues <https://github.com/compSPI/compSPI/labels/easy>`_ instead.
 
 .. topic:: starter project tag
 
-    If you have already contributed to compspi, another great way to contribute
-    to compspi is to pick an item from the list of `starter project
-    <https://github.com/compspi/compspi/labels/starter%project>`_ in the issue
+    If you have already contributed to compSPI, another great way to contribute
+    to compSPI is to pick an item from the list of `starter project
+    <https://github.com/compSPI/compSPI/labels/starter%20project>`_ in the issue
     tracker. Your assistance in this area will be greatly appreciated by the
     more experienced developers as it helps free up their time to concentrate on
     other issues.
@@ -356,7 +360,7 @@ underestimate how easy an issue is to solve!
     we use the help wanted tag to mark Pull Requests which have been abandoned
     by their original contributor and are available for someone to pick up where the original
     contributor left off. The list of issues with the help wanted tag can be found
-    `here <https://github.com/compspi/compspi/labels/help%20wanted>`__ .
+    `here <https://github.com/compspi/compspi/labels/help%20wanted>`__.
 
     Note that not all issues which need contributors will have this tag.
 
@@ -376,7 +380,7 @@ Building the documentation requires installing sphinx::
 
    pip3 install sphinx
 
-To build the documentation, you need to be in the main ``compspi`` folder. You can do this with::
+To build the documentation, you need to be in the main ``compSPI`` folder. You can do this with::
 
    sphinx-build docs/ docs/html
 
@@ -390,14 +394,14 @@ A docstring is a well-formatted description of your function/class/module which 
 its purpose, usage, and other information.
 
 There are different markdown languages/formats used for docstrings in Python. The most common
-three are reStructuredText, numpy, and google docstring styles. For compspi, we are
+three are reStructuredText, numpy, and google docstring styles. For compSPI, we are
 using the numpy docstring standard.
 When writing up your docstrings, please review the `NumPy docstring guidge <https://numpydoc.readthedocs.io/en/latest/format.html>`_
 to understand the role and syntax of each section. Following this syntax is important not only for readability,
 it is also required for automated parsing for inclusion into our generated API Reference.
 
 You can look at these for any object by printing out the ``__doc__`` attribute.
-Try this out with the np.array class and the np.mean function to see good examples::
+Try this out with the ``np.array`` class and the ``np.mean`` function to see good examples::
 
     >>> import numpy as np
     >>> print(np.mean.__doc__)
@@ -549,14 +553,14 @@ rules. However, following these rules when submitting new code makes
 the review easier so new code can be integrated in less time. Uniformly
 formatted code makes it easier to share code ownership.
 
-In addition to the PEP8 standards, compspi follows the following
+In addition to the PEP8 standards, compSPI follows the following
 guidelines:
 
 1. Use underscores to separate words in non class names: ``n_samples``
    rather than ``nsamples``.
 
 2. Avoid single-character variable names. This prevents using automatic
-   tools to find-and-replace code, as searching for ``x`` in compspi
+   tools to find-and-replace code, as searching for ``x`` in compSPI
    will return the whole database. At least 3 characters are advised
    for a variable name.
 
@@ -570,7 +574,7 @@ guidelines:
    generated automatically on the website. Furthermore, forbidding comments
    forces us to write clean code, and clean docstrings.
 
-5. Follow compspi' API. For example, points on manifolds are denoted
+5. Follow compSPI's API. For example, points on manifolds are denoted
    ``point``, tangent vectors ``tangent_vec``, matrices ``mat``, exponential
    ``exp`` and logarithms ``log``.
 
@@ -584,7 +588,7 @@ guidelines:
    longer explicitly referenced, but most important, it prevents
    using a static analysis tool like `pyflakes
    <https://divmod.readthedocs.io/en/latest/products/pyflakes.html>`_ to
-   automatically find bugs in compspi.
+   automatically find bugs in compSPI.
 
 8. Avoid the use of ``import ... as`` and of ``from ... import foo, bar``,
    i.e. do not rename modules or modules' functions, because you would create
@@ -611,7 +615,7 @@ as the indentation will break and raise a flake8 error if the name
 of the function is changed.
 
 These guidelines can be revised and modified at any time, the only constraint
-is that they should remain consistent through the codebase. To change compspi
+is that they should remain consistent through the codebase. To change compSPI
 style guidelines, submit a PR to this contributing file, together with the
 corresponding changes in the codebase.
 
@@ -621,7 +625,7 @@ Code Review Guidelines
 ----------------------
 
 Reviewing code contributed to the project as PRs is a crucial component of
-compspi development. We encourage anyone to start reviewing code of other
+compSPI development. We encourage anyone to start reviewing code of other
 developers. The code review process is often highly educational for everybody
 involved. This is particularly appropriate if it is a feature you would like to
 use, and so can respond critically about whether the PR meets your needs. While
@@ -632,15 +636,15 @@ Here are a few important aspects that need to be covered in any code review,
 from high-level questions to a more detailed check-list.
 
 - Do we want this in the library? Is it likely to be used? Do you, as
-  a compspi user, like the change and intend to use it? Is it in
-  the scope of compspi? Will the cost of maintaining a new
+  a compSPI user, like the change and intend to use it? Is it in
+  the scope of compSPI? Will the cost of maintaining a new
   feature be worth its benefits?
 
-- Is the code consistent with the API of compspi? Are public
+- Is the code consistent with the API of compSPI? Are public
   functions/classes/parameters well named and intuitively designed?
 
 - Are all public functions/classes and their parameters, return types, and
-  stored attributes named according to compspi conventions and documented
+  stored attributes named according to compSPI conventions and documented
   clearly?
 
 - Is every public function/class tested? Are a reasonable set of
