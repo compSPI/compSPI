@@ -1,7 +1,6 @@
 """Test functions for distributions."""
 
 import torch
-
 from compSPI.distributions import uniform_to_triangular
 
 
