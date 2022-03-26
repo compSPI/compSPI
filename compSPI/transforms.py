@@ -47,6 +47,7 @@ def primal_to_fourier_3D(r):
     ----------
     r: torch.Tensor
         Tensor of size (batch, size, size, size)
+
     Returns
     -------
     out: torch.Tensor
@@ -66,6 +67,7 @@ def fourier_to_primal_3D(f):
     ----------
     f: torch.Tensor
         Tensor of size (batch, size, size, size)
+
     Returns
     -------
     out: torch.Tensor
