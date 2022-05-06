@@ -281,7 +281,7 @@ class ResidLinear(nn.Module):
             type of initialization ('normal', None)
         """
         super(ResidLinear, self).__init__()
-        self.linear = nn.Linear(dim)
+        self.linear = nn.Linear(dim, dim)
         if init == 'normal':
             init_weights_normal(self.linear)
 
