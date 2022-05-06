@@ -61,6 +61,7 @@ class EncoderCryoAI(torch.nn.Module):
         else:
             self.apply_mask = False
 
+        self.coord_conv = coord_conv
         if coord_conv:
             self.coord_conv_layer = AddCoordinates(with_r=True)
             in_dim_cnn = 4
