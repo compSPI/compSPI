@@ -203,7 +203,7 @@ class ResidLinearMLP(nn.Module):
     """
 
     def __init__(self, in_dim, nlayers, hidden_dim, out_dim,
-                 activation=nn.ReLU(), batchnorm=True, init=None):
+                 activation='relu', batchnorm=True, init=None):
         """
         Initialization of residual MLP.
 
@@ -226,19 +226,22 @@ class ResidLinearMLP(nn.Module):
         """
         super(ResidLinearMLP, self).__init__()
 
-        self.in_dim = in_dim
+        if activation == 'relu':
+            nl = nn.ReLU()
+        else:
+            raise NotImplementedError
 
         layers = [ResidLinear(in_dim,
                               init=init) if in_dim == hidden_dim else nn.Linear(
             in_dim, hidden_dim),
-                  activation]
+                  nl]
 
         if batchnorm:
             layers.append(nn.BatchNorm1d(hidden_dim))
 
         for _ in range(nlayers - 1):
             layers.append(ResidLinear(hidden_dim, init=init))
-            layers.append(activation)
+            layers.append(nl)
             if batchnorm:
                 layers.append(nn.BatchNorm1d(hidden_dim))
 

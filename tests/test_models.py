@@ -42,7 +42,7 @@ def test_ResidLinearMLP():
     hidden_dim = 256
     out_dim = 128
     x = torch.rand(B, in_dim)
-    main = models.ResidLinearMLP(in_dim, nlayers, hidden_dim, out_dim, activation=nn.ELU(),
+    main = models.ResidLinearMLP(in_dim, nlayers, hidden_dim, out_dim,
                                  batchnorm=True, init='normal')
     assert main(x).shape == (B, out_dim)
 
