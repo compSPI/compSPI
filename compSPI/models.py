@@ -168,7 +168,7 @@ class EncoderCryoAI(torch.nn.Module):
         trans = self.trans_encoder(features)
         return trans
 
-    def encode(self, img):
+    def forward(self, img):
         """
         Extract rotation and translation parameters from images.
 
