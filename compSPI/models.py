@@ -5,7 +5,8 @@ import torch.nn as nn
 
 
 class EncoderCryoAI(torch.nn.Module):
-    """Encoder that predicts poses (rotations and translation) from images.
+    """
+    Encoder that predicts poses (rotations and translation) from images.
 
     Reference: Levy, Axel, et al. "CryoAI: Amortized Inference of Poses for
     Ab Initio Reconstruction of 3D Molecular Volumes from Real Cryo-EM
@@ -17,7 +18,8 @@ class EncoderCryoAI(torch.nn.Module):
                  dim_hidden_trans=128, hidden_layers_features=2,
                  hidden_layers_rot=3, hidden_layers_trans=2,
                  n_filters=64, mask=None, coord_conv=True):
-        """Initialization of the encoder.
+        """
+        Initialization of the encoder.
 
         Parameters
         ----------
@@ -112,7 +114,8 @@ class EncoderCryoAI(torch.nn.Module):
                                             init='normal')
 
     def extract_features(self, img):
-        """Extract high level visual features from images.
+        """
+        Extract high level visual features from images.
 
         Parameters
         ----------
@@ -132,7 +135,8 @@ class EncoderCryoAI(torch.nn.Module):
         return features
 
     def extract_rot(self, features):
-        """Extract rotations from high level visual features.
+        """
+        Extract rotations from high level visual features.
 
         Parameters
         ----------
@@ -148,7 +152,8 @@ class EncoderCryoAI(torch.nn.Module):
         return rot
 
     def extract_trans(self, features):
-        """Extract rotations from high level visual features.
+        """
+        Extract rotations from high level visual features.
 
         Parameters
         ----------
@@ -164,7 +169,8 @@ class EncoderCryoAI(torch.nn.Module):
         return trans
 
     def encode(self, img):
-        """Extract rotation and translation parameters from images.
+        """
+        Extract rotation and translation parameters from images.
 
         Parameters
         ----------
@@ -187,7 +193,8 @@ class EncoderCryoAI(torch.nn.Module):
 
 
 class ResidLinearMLP(nn.Module):
-    """Residual MLP imported from cryoDRGN2.
+    """
+    Residual MLP imported from cryoDRGN2.
 
     Reference: Zhong, Ellen D., et al. "CryoDRGN2: Ab initio neural
     reconstruction of 3D protein structures from real cryo-EM images."
@@ -197,7 +204,8 @@ class ResidLinearMLP(nn.Module):
 
     def __init__(self, in_dim, nlayers, hidden_dim, out_dim,
                  activation=nn.ReLU(), batchnorm=True, init=None):
-        """Initialization of residual MLP.
+        """
+        Initialization of residual MLP.
 
         Parameters
         ----------
@@ -241,7 +249,8 @@ class ResidLinearMLP(nn.Module):
         self.main = nn.Sequential(*layers)
 
     def forward(self, x):
-        """Forward pass.
+        """
+        Forward pass.
 
         Parameters
         ----------
@@ -251,7 +260,8 @@ class ResidLinearMLP(nn.Module):
         Returns
         -------
         out: torch.Tensor
-            Tensor of size (batch, out_dim)"""
+            Tensor of size (batch, out_dim)
+        """
         out = self.main(x)
         return out
 
@@ -260,7 +270,8 @@ class ResidLinear(nn.Module):
     """Residual linear layer."""
 
     def __init__(self, dim, init=None):
-        """Initialization of residual linear layer.
+        """
+        Initialization of residual linear layer.
 
         Parameters
         ----------
@@ -275,7 +286,8 @@ class ResidLinear(nn.Module):
             init_weights_normal(self.linear)
 
     def forward(self, x):
-        """Forward pass.
+        """
+        Forward pass.
 
         Parameters
         ----------
@@ -292,7 +304,8 @@ class ResidLinear(nn.Module):
 
 
 class AddCoordinates(nn.Module):
-    """CoordConv layer.
+    """
+    CoordConv layer.
 
     Reference :Liu, Rosanne, et al. "An intriguing failing of convolutional
     neural networks and the coordconv solution." Advances in neural
@@ -300,7 +313,8 @@ class AddCoordinates(nn.Module):
     """
 
     def __init__(self, with_r=False):
-        """Initialization of CoordConv.
+        """
+        Initialization of CoordConv.
 
         Parameters
         ----------
@@ -311,7 +325,8 @@ class AddCoordinates(nn.Module):
         self.with_r = with_r
 
     def forward(self, img):
-        """Forward pass.
+        """
+        Forward pass.
 
         Parameters
         ----------
@@ -348,14 +363,15 @@ class AddCoordinates(nn.Module):
 
 
 def init_weights_normal(m):
-    """Initialization of a linear layer with kaiming normal distribution.
+    """
+    Initialization of a linear layer with kaiming normal distribution.
 
     Parameters
     ----------
     m: torch.nn.Module
         Linear torch module
     """
-    if type(m) == nn.Linear:
+    if type(m) is nn.Linear:
         if hasattr(m, 'weight'):
             nn.init.kaiming_normal_(m.weight, a=0.0, nonlinearity='relu',
                                     mode='fan_out')
