@@ -24,7 +24,7 @@ class EncoderCryoAI(torch.nn.Module):
         Parameters
         ----------
         size: int
-            resolution of input images
+            resolution of input images (must be >= 32)
         dim_rot: int
             Number of dimensions to represent rotations
         dim_trans: int
@@ -67,8 +67,6 @@ class EncoderCryoAI(torch.nn.Module):
             in_dim_cnn = 4
         else:
             in_dim_cnn = 1
-
-        assert size >= 32
 
         cnn = [nn.Conv2d(in_dim_cnn, n_filters, 5, stride=1, padding=2)]
 
@@ -133,8 +131,8 @@ class EncoderCryoAI(torch.nn.Module):
             Tensor of size (batch, dim_features)
         """
         if self.coord_conv:
-            x = self.coord_conv_layer(img)
-        x = self.cnn(x)
+            img = self.coord_conv_layer(img)
+        x = self.cnn(img)
         x = x.reshape(-1, self.out_dim_cnn)
         features = self.mlp(x)
         return features
