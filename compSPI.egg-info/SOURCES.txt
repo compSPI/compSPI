@@ -1,7 +1,0 @@
-README.md
-setup.py
-compSPI.egg-info/PKG-INFO
-compSPI.egg-info/SOURCES.txt
-compSPI.egg-info/dependency_links.txt
-compSPI.egg-info/not-zip-safe
-compSPI.egg-info/top_level.txt
