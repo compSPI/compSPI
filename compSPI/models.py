@@ -103,11 +103,11 @@ class EncoderCryoAI(torch.nn.Module):
 
         self.out_dim_cnn = 4 * n_filters * (size // 32) * (size // 32)
         self.mlp = ResidLinearMLP(self.out_dim_cnn, hidden_layers_features,
-                                  dim_hidden_features, dim_features, nn.ReLU,
+                                  dim_hidden_features, dim_features,
                                   init='normal')
 
         self.rot_encoder = ResidLinearMLP(dim_features, hidden_layers_rot,
-                                          dim_hidden_rot, dim_rot, nn.ReLU,
+                                          dim_hidden_rot, dim_rot,
                                           init='normal')
         self.trans_encoder = ResidLinearMLP(dim_features, hidden_layers_trans,
                                             dim_hidden_trans, dim_trans,
@@ -217,8 +217,8 @@ class ResidLinearMLP(nn.Module):
             number of hidden dimensions
         out_dim: int
             number of dimensions of the output
-        activation: torch.nn.Module
-            activation function
+        activation: str
+            activation function ('relu')
         batchnorm: bool
             use batch normalization
         init: str
