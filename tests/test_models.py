@@ -50,7 +50,7 @@ def test_ResidLinearMLP():
 def test_EncoderCryoAI():
     """Unit test for EncoderCryoAI"""
     B = 5
-    size = 16
+    size = 64
     img = torch.rand(B, 1, size, size)
     mask = (torch.rand(B, 1, size, size) > 0.5)
     encoder_cryoAI = models.EncoderCryoAI(size)

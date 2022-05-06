@@ -68,6 +68,8 @@ class EncoderCryoAI(torch.nn.Module):
         else:
             in_dim_cnn = 1
 
+        assert size >= 32
+
         cnn = [nn.Conv2d(in_dim_cnn, n_filters, 5, stride=1, padding=2)]
 
         cnn.append(nn.ReLU(inplace=True))
