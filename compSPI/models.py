@@ -58,6 +58,8 @@ class EncoderCryoAI(torch.nn.Module):
         if mask is not None:
             self.apply_mask = True
             self.mask = mask[None, None, :, :]
+        else:
+            self.apply_mask = False
 
         if coord_conv:
             self.coord_conv_layer = AddCoordinates(with_r=True)
