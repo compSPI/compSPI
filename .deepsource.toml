@@ -1,0 +1,13 @@
+version = 1
+
+test_patterns = ["tests/**"]
+
+exclude_patterns = ["README.md"]
+
+[[analyzers]]
+name = "python"
+enabled = true
+
+[[analyzers]]
+name = "test-coverage"
+enabled = true

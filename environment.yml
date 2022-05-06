@@ -1,0 +1,16 @@
+name: compSPI
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - codecov
+  - configparser
+  - coverage
+  - numpy
+  - pip
+  - pytest
+  - pytest-cov
+  - pytorch=1.9.0
+  - pip:
+    - git+https://github.com/compSPI/ioSPI.git
+    - git+https://github.com/compSPI/simSPI.git

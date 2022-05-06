@@ -1,0 +1,12 @@
+name: 'Execute in Docker container'
+description: 'Execute command in Docker container'
+inputs:
+  command:
+    description: 'Command to be execute in Docker container'
+    required: true
+    default: 'ls -altrh /'
+runs:
+  using: 'docker'
+  image: 'docker://fpoitevi/compspi:test'
+  args:
+    - ${{ inputs.command }}
