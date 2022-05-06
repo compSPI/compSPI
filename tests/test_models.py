@@ -9,7 +9,7 @@ import compSPI.models as models
 def test_init_weights_normal():
     """Unit test for init_weights_normal"""
     dim = 16
-    models.init_weights_normal(nn.Linear(dim))
+    models.init_weights_normal(nn.Linear(dim, dim))
 
 
 def test_AddCoordinates():
