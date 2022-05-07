@@ -149,9 +149,7 @@ def test_fourier_3D():
         gauss_dist = torch.distributions.Normal(
             torch.zeros(batch, n_pix, n_pix, n_pix), 1
         )
-        rand_2d = gauss_dist.sample().reshape(
-            1,
-        )
+        rand_2d = gauss_dist.sample()
         rand_2d_f = primal_to_fourier_3D(rand_2d)
         rand_2d_f_r = fourier_to_primal_3D(rand_2d_f)
         assert torch.allclose(rand_2d, rand_2d_f_r.real, atol=recovery_atol)
