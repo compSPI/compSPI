@@ -62,6 +62,7 @@ def test_fourier_2D():
 
     Apply the fourier transforms and its inverse and check for recovery.
     """
+    atol = 1e-5
     n_half = torch.randint(low=8, high=256, size=(1,)).item()
     n_odd = 2 * n_half + 1
     n_even = 2 * n_half
@@ -70,12 +71,12 @@ def test_fourier_2D():
         rand_2d = gauss_dist.sample()
         rand_2d_f = primal_to_fourier_2D(rand_2d)
         rand_2d_f_r = fourier_to_primal_2D(rand_2d_f)
-        assert torch.allclose(rand_2d, rand_2d_f_r.real, atol=1e-4)
+        assert torch.allclose(rand_2d, rand_2d_f_r.real, atol=atol)
 
         rand_2d_f = gauss_dist.sample() + 1j * gauss_dist.sample()
         rand_2d_f_r = fourier_to_primal_2D(rand_2d_f)
         rand_2d_f_r_f = primal_to_fourier_2D(rand_2d_f_r)
-        assert torch.allclose(rand_2d_f, rand_2d_f_r_f, atol=1e-4)
+        assert torch.allclose(rand_2d_f, rand_2d_f_r_f, atol=atol)
 
 
 def test_primal_to_fourier_3D():
