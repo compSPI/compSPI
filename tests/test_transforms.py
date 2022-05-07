@@ -1,6 +1,7 @@
 """Test functions for transforms."""
 
 import torch
+from torch import tensor
 
 from compSPI.transforms import (
     fourier_to_primal_2D,
@@ -62,21 +63,28 @@ def test_fourier_2D():
 
     Apply the fourier transforms and its inverse and check for recovery.
     """
-    atol = 1e-5
-    n_half = torch.randint(low=8, high=256, size=(1,)).item()
+    recovery_atol = 1e-5
+    no_imag_atol = 1e-4
+    n_half = torch.randint(low=8, high=32, size=(1,)).item()
     n_odd = 2 * n_half + 1
     n_even = 2 * n_half
+    batch = torch.randint(low=10, high=20, size=(1,)).item()
     for n_pix in [n_even, n_odd]:
-        gauss_dist = torch.distributions.Normal(torch.zeros(n_pix, n_pix), 1)
+        gauss_dist = torch.distributions.Normal(torch.zeros(batch, 1, n_pix, n_pix), 1)
         rand_2d = gauss_dist.sample()
         rand_2d_f = primal_to_fourier_2D(rand_2d)
         rand_2d_f_r = fourier_to_primal_2D(rand_2d_f)
-        assert torch.allclose(rand_2d, rand_2d_f_r.real, atol=atol)
+        assert torch.allclose(rand_2d, rand_2d_f_r.real, atol=recovery_atol)
+        assert torch.isclose(
+            rand_2d_f_r.imag.norm() / rand_2d_f_r.real.norm(),
+            tensor(0.0),
+            atol=no_imag_atol,
+        )
 
         rand_2d_f = gauss_dist.sample() + 1j * gauss_dist.sample()
         rand_2d_f_r = fourier_to_primal_2D(rand_2d_f)
         rand_2d_f_r_f = primal_to_fourier_2D(rand_2d_f_r)
-        assert torch.allclose(rand_2d_f, rand_2d_f_r_f, atol=atol)
+        assert torch.allclose(rand_2d_f, rand_2d_f_r_f, atol=recovery_atol)
 
 
 def test_primal_to_fourier_3D():
@@ -124,3 +132,36 @@ def test_fourier_to_primal_3D():
 
         error = (expected_im - im).abs().sum() / expected_im.abs().sum()
         assert error < 0.01
+
+
+def test_fourier_3D():
+    """Test if the 3D fourier transform and its inverse together are correct.
+
+    Apply the fourier transforms and its inverse and check for recovery.
+    """
+    recovery_atol = 1e-5
+    no_imag_atol = 1e-6
+    n_half = torch.randint(low=8, high=32, size=(1,)).item()
+    n_odd = 2 * n_half + 1
+    n_even = 2 * n_half
+    batch = torch.randint(low=10, high=20, size=(1,)).item()
+    for n_pix in [n_even, n_odd]:
+        gauss_dist = torch.distributions.Normal(
+            torch.zeros(batch, n_pix, n_pix, n_pix), 1
+        )
+        rand_2d = gauss_dist.sample().reshape(
+            1,
+        )
+        rand_2d_f = primal_to_fourier_3D(rand_2d)
+        rand_2d_f_r = fourier_to_primal_3D(rand_2d_f)
+        assert torch.allclose(rand_2d, rand_2d_f_r.real, atol=recovery_atol)
+        assert torch.isclose(
+            rand_2d_f_r.imag.norm() / rand_2d_f_r.real.norm(),
+            tensor(0.0),
+            atol=no_imag_atol,
+        )
+
+        rand_2d_f = gauss_dist.sample() + 1j * gauss_dist.sample()
+        rand_2d_f_r = fourier_to_primal_3D(rand_2d_f)
+        rand_2d_f_r_f = primal_to_fourier_3D(rand_2d_f_r)
+        assert torch.allclose(rand_2d_f, rand_2d_f_r_f, atol=recovery_atol)
