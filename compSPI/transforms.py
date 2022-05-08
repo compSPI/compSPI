@@ -9,14 +9,15 @@ def primal_to_fourier_2D(r):
     ----------
     r: torch.Tensor
         Tensor of size (batch, 1, size, size)
+        size can be odd or even
 
     Returns
     -------
     out: torch.Tensor
         Tensor of size (batch, 1, size, size)
     """
-    r = torch.fft.fftshift(r, dim=(-2, -1))
-    return torch.fft.ifftshift(
+    r = torch.fft.ifftshift(r, dim=(-2, -1))
+    return torch.fft.fftshift(
         torch.fft.fftn(r, s=(r.shape[-2], r.shape[-1]), dim=(-2, -1)), dim=(-2, -1)
     )
 
@@ -28,6 +29,7 @@ def fourier_to_primal_2D(f):
     ----------
     f: torch.Tensor
         Tensor of size (batch, 1, size, size)
+        size can be odd or even
 
     Returns
     -------
@@ -47,14 +49,15 @@ def primal_to_fourier_3D(r):
     ----------
     r: torch.Tensor
         Tensor of size (batch, size, size, size)
+        size can be odd or even
 
     Returns
     -------
     out: torch.Tensor
         Tensor of size (batch, size, size, size)
     """
-    r = torch.fft.fftshift(r, dim=(-3, -2, -1))
-    return torch.fft.ifftshift(
+    r = torch.fft.ifftshift(r, dim=(-3, -2, -1))
+    return torch.fft.fftshift(
         torch.fft.fftn(r, s=(r.shape[-3], r.shape[-2], r.shape[-1]), dim=(-3, 2, -1)),
         dim=(-3, -2, -1),
     )
@@ -67,6 +70,7 @@ def fourier_to_primal_3D(f):
     ----------
     f: torch.Tensor
         Tensor of size (batch, size, size, size)
+        size can be odd or even
 
     Returns
     -------

@@ -1,8 +1,14 @@
 """Test functions for transforms."""
 
 import torch
+from torch import tensor
 
-import compSPI.transforms
+from compSPI.transforms import (
+    fourier_to_primal_2D,
+    fourier_to_primal_3D,
+    primal_to_fourier_2D,
+    primal_to_fourier_3D,
+)
 
 
 def test_primal_to_fourier_2D():
@@ -17,7 +23,7 @@ def test_primal_to_fourier_2D():
         im[0, 0, size // 2, size // 2] = 1
         im[1, 0, :, :] = 1
 
-        im_fourier = compSPI.transforms.primal_to_fourier_2D(im)
+        im_fourier = primal_to_fourier_2D(im)
 
         expected_im_fourier = torch.zeros(2, 1, size, size)
         expected_im_fourier[0] = im[1] * im[0].sum()
@@ -42,7 +48,7 @@ def test_fourier_to_primal_2D():
         im_fourier[0, 0, size // 2, size // 2] = 1
         im_fourier[1, 0, :, :] = 1
 
-        im = compSPI.transforms.fourier_to_primal_2D(im_fourier)
+        im = fourier_to_primal_2D(im_fourier)
 
         expected_im = torch.zeros(2, 1, size, size)
         expected_im[0] = im_fourier[1] / size**2
@@ -50,6 +56,35 @@ def test_fourier_to_primal_2D():
 
         error = (expected_im - im).abs().sum() / expected_im.abs().sum()
         assert error < 0.01
+
+
+def test_fourier_2D():
+    """Test if the 2D fourier transform and its inverse together are correct.
+
+    Apply the fourier transforms and its inverse and check for recovery.
+    """
+    recovery_atol = 1e-5
+    no_imag_atol = 1e-4
+    n_half = torch.randint(low=8, high=32, size=(1,)).item()
+    n_odd = 2 * n_half + 1
+    n_even = 2 * n_half
+    batch = torch.randint(low=10, high=20, size=(1,)).item()
+    for n_pix in [n_even, n_odd]:
+        gauss_dist = torch.distributions.Normal(torch.zeros(batch, 1, n_pix, n_pix), 1)
+        rand_2d = gauss_dist.sample()
+        rand_2d_f = primal_to_fourier_2D(rand_2d)
+        rand_2d_f_r = fourier_to_primal_2D(rand_2d_f)
+        assert torch.allclose(rand_2d, rand_2d_f_r.real, atol=recovery_atol)
+        assert torch.isclose(
+            rand_2d_f_r.imag.norm() / rand_2d_f_r.real.norm(),
+            tensor(0.0),
+            atol=no_imag_atol,
+        )
+
+        rand_2d_f = gauss_dist.sample() + 1j * gauss_dist.sample()
+        rand_2d_f_r = fourier_to_primal_2D(rand_2d_f)
+        rand_2d_f_r_f = primal_to_fourier_2D(rand_2d_f_r)
+        assert torch.allclose(rand_2d_f, rand_2d_f_r_f, atol=recovery_atol)
 
 
 def test_primal_to_fourier_3D():
@@ -64,7 +99,7 @@ def test_primal_to_fourier_3D():
         im[0, size // 2, size // 2, size // 2] = 1
         im[1, :, :, :] = 1
 
-        im_fourier = compSPI.transforms.primal_to_fourier_3D(im)
+        im_fourier = primal_to_fourier_3D(im)
 
         expected_im_fourier = torch.zeros(2, size, size, size)
         expected_im_fourier[0] = im[1] * im[0].sum()
@@ -89,7 +124,7 @@ def test_fourier_to_primal_3D():
         im_fourier[0, size // 2, size // 2, size // 2] = 1
         im_fourier[1, :, :, :] = 1
 
-        im = compSPI.transforms.fourier_to_primal_3D(im_fourier)
+        im = fourier_to_primal_3D(im_fourier)
 
         expected_im = torch.zeros(2, size, size, size)
         expected_im[0] = im_fourier[1] / size**3
@@ -97,3 +132,34 @@ def test_fourier_to_primal_3D():
 
         error = (expected_im - im).abs().sum() / expected_im.abs().sum()
         assert error < 0.01
+
+
+def test_fourier_3D():
+    """Test if the 3D fourier transform and its inverse together are correct.
+
+    Apply the fourier transforms and its inverse and check for recovery.
+    """
+    recovery_atol = 1e-5
+    no_imag_atol = 1e-6
+    n_half = torch.randint(low=8, high=32, size=(1,)).item()
+    n_odd = 2 * n_half + 1
+    n_even = 2 * n_half
+    batch = torch.randint(low=10, high=20, size=(1,)).item()
+    for n_pix in [n_even, n_odd]:
+        gauss_dist = torch.distributions.Normal(
+            torch.zeros(batch, n_pix, n_pix, n_pix), 1
+        )
+        rand_2d = gauss_dist.sample()
+        rand_2d_f = primal_to_fourier_3D(rand_2d)
+        rand_2d_f_r = fourier_to_primal_3D(rand_2d_f)
+        assert torch.allclose(rand_2d, rand_2d_f_r.real, atol=recovery_atol)
+        assert torch.isclose(
+            rand_2d_f_r.imag.norm() / rand_2d_f_r.real.norm(),
+            tensor(0.0),
+            atol=no_imag_atol,
+        )
+
+        rand_2d_f = gauss_dist.sample() + 1j * gauss_dist.sample()
+        rand_2d_f_r = fourier_to_primal_3D(rand_2d_f)
+        rand_2d_f_r_f = primal_to_fourier_3D(rand_2d_f_r)
+        assert torch.allclose(rand_2d_f, rand_2d_f_r_f, atol=recovery_atol)
