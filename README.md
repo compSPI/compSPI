@@ -6,6 +6,12 @@
 # compSPI
 Computational Single Particle Imaging
 
+**Vision**: the finality of `compSPI` is to accelerate entry for method developers in cryoEM and other single particle imaging modalities.
+
+![compSPI](docs/compSPI.png)
+
+## the compSPI organization
+
 This is compSPI central repo. Satellite repos can be found in the [compSPI organization](https://github.com/compSPI):
 - [ioSPI](https://github.com/compSPI/ioSPI): Methods and tools to read and write data in all formats. Also provides methods to use other SPI tools developed outside of compSPI.
 - [reduceSPI](https://github.com/compSPI/reduceSPI): Dimensionality reduction methods and tools.
