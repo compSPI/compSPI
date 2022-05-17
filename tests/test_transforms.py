@@ -29,8 +29,8 @@ def test_primal_to_fourier_2D():
         expected_im_fourier[1] = im[0] * im[1].sum()
 
         error = (
-                        expected_im_fourier - im_fourier
-                ).abs().sum() / expected_im_fourier.abs().sum()
+            expected_im_fourier - im_fourier
+        ).abs().sum() / expected_im_fourier.abs().sum()
 
         assert error < 0.01
 
@@ -49,7 +49,7 @@ def test_fourier_to_primal_2D():
         im = fourier_to_primal_2D(im_fourier)
 
         expected_im = torch.zeros(2, 1, size, size)
-        expected_im[0] = im_fourier[1] / size ** 2
+        expected_im[0] = im_fourier[1] / size**2
         expected_im[1] = im_fourier[0]
 
         error = (expected_im - im).abs().sum() / expected_im.abs().sum()
@@ -103,8 +103,8 @@ def test_primal_to_fourier_3D():
         expected_im_fourier[1] = im[0] * im[1].sum()
 
         error = (
-                        expected_im_fourier - im_fourier
-                ).abs().sum() / expected_im_fourier.abs().sum()
+            expected_im_fourier - im_fourier
+        ).abs().sum() / expected_im_fourier.abs().sum()
 
         assert error < 0.01
 
@@ -123,7 +123,7 @@ def test_fourier_to_primal_3D():
         im = fourier_to_primal_3D(im_fourier)
 
         expected_im = torch.zeros(2, size, size, size)
-        expected_im[0] = im_fourier[1] / size ** 3
+        expected_im[0] = im_fourier[1] / size**3
         expected_im[1] = im_fourier[0]
 
         error = (expected_im - im).abs().sum() / expected_im.abs().sum()
