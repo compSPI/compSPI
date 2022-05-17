@@ -8,51 +8,61 @@ class EncoderCryoAI(torch.nn.Module):
     """
     Encoder that predicts poses (rotations and translation) from images.
 
-    Reference: Levy, Axel, et al. "CryoAI: Amortized Inference of Poses for
+    Parameters
+    ----------
+    size: int
+        resolution of input images (must be >= 32)
+    dim_rot: int
+        Number of dimensions to represent rotations
+    dim_trans: int
+        Number of dimensions to represent translations
+    dim_features: int
+        Number of dimensions of high level features
+    dim_hidden_features: int
+        Number of hidden dimensions in the MLP
+    dim_hidden_rot: int
+        Number of hidden dimensions in the MLP
+    dim_hidden_trans: int
+        Number of hidden dimensions in the MLP
+    hidden_layers_features: int
+        Number of hidden layers in the MLP
+    hidden_layers_rot: int
+        Number of hidden layers in the MLP
+    hidden_layers_trans: int
+        Number of hidden layers in the MLP
+    n_filters: int
+        Number of filters in the first convolutional layer
+    coord_conv: bool
+        Use CoordConv layer first (Liu, Rosanne, et al. "An intriguing
+        failing of convolutional neural networks and the coordconv
+        solution." Advances in neural information processing systems 31
+        (2018))
+    mask: torch.Tensor
+        Boolean tensor of size (D, D)
+
+    Reference
+    ---------
+    Levy, Axel, et al. "CryoAI: Amortized Inference of Poses for
     Ab Initio Reconstruction of 3D Molecular Volumes from Real Cryo-EM
     Images." arXiv preprint arXiv:2203.08138 (2022).
     """
 
-    def __init__(self, size, dim_rot=6, dim_trans=2, dim_features=256,
-                 dim_hidden_features=256, dim_hidden_rot=128,
-                 dim_hidden_trans=128, hidden_layers_features=2,
-                 hidden_layers_rot=3, hidden_layers_trans=2,
-                 n_filters=64, mask=None, coord_conv=True):
-        """
-        Initialization of the encoder.
-
-        Parameters
-        ----------
-        size: int
-            resolution of input images (must be >= 32)
-        dim_rot: int
-            Number of dimensions to represent rotations
-        dim_trans: int
-            Number of dimensions to represent translations
-        dim_features: int
-            Number of dimensions of high level features
-        dim_hidden_features: int
-            Number of hidden dimensions in the MLP
-        dim_hidden_rot: int
-            Number of hidden dimensions in the MLP
-        dim_hidden_trans: int
-            Number of hidden dimensions in the MLP
-        hidden_layers_features: int
-            Number of hidden layers in the MLP
-        hidden_layers_rot: int
-            Number of hidden layers in the MLP
-        hidden_layers_trans: int
-            Number of hidden layers in the MLP
-        n_filters: int
-            Number of filters in the first convolutional layer
-        coord_conv: bool
-            Use CoordConv layer first (Liu, Rosanne, et al. "An intriguing
-            failing of convolutional neural networks and the coordconv
-            solution." Advances in neural information processing systems 31
-            (2018))
-        mask: torch.Tensor
-            Boolean tensor of size (D, D)
-        """
+    def __init__(
+        self,
+        size,
+        dim_rot=6,
+        dim_trans=2,
+        dim_features=256,
+        dim_hidden_features=256,
+        dim_hidden_rot=128,
+        dim_hidden_trans=128,
+        hidden_layers_features=2,
+        hidden_layers_rot=3,
+        hidden_layers_trans=2,
+        n_filters=64,
+        mask=None,
+        coord_conv=True,
+    ):
         super(EncoderCryoAI, self).__init__()
 
         if mask is not None:
@@ -80,23 +90,19 @@ class EncoderCryoAI(torch.nn.Module):
 
         cnn.append(nn.Conv2d(n_filters, n_filters * 2, 3, stride=1, padding=1))
         cnn.append(nn.ReLU(inplace=True))
-        cnn.append(
-            nn.Conv2d(n_filters * 2, n_filters * 2, 3, stride=1, padding=1))
+        cnn.append(nn.Conv2d(n_filters * 2, n_filters * 2, 3, stride=1, padding=1))
         cnn.append(nn.ReLU(inplace=True))
         cnn.append(nn.BatchNorm2d(n_filters * 2))
         cnn.append(nn.MaxPool2d(kernel_size=2))
 
-        cnn.append(
-            nn.Conv2d(n_filters * 2, n_filters * 4, 3, stride=1, padding=1))
+        cnn.append(nn.Conv2d(n_filters * 2, n_filters * 4, 3, stride=1, padding=1))
         cnn.append(nn.ReLU(inplace=True))
-        cnn.append(
-            nn.Conv2d(n_filters * 4, n_filters * 4, 3, stride=1, padding=1))
+        cnn.append(nn.Conv2d(n_filters * 4, n_filters * 4, 3, stride=1, padding=1))
         cnn.append(nn.ReLU(inplace=True))
         cnn.append(nn.BatchNorm2d(n_filters * 4))
         cnn.append(nn.MaxPool2d(kernel_size=2))
 
-        cnn.append(
-            nn.Conv2d(n_filters * 4, n_filters * 4, 3, stride=1, padding=1))
+        cnn.append(nn.Conv2d(n_filters * 4, n_filters * 4, 3, stride=1, padding=1))
         cnn.append(nn.ReLU(inplace=True))
         cnn.append(nn.BatchNorm2d(n_filters * 4))
         cnn.append(nn.MaxPool2d(kernel_size=2))
@@ -105,20 +111,27 @@ class EncoderCryoAI(torch.nn.Module):
         self.cnn = nn.Sequential(*cnn)
 
         self.out_dim_cnn = 4 * n_filters * (size // 32) * (size // 32)
-        self.mlp = ResidLinearMLP(self.out_dim_cnn, hidden_layers_features,
-                                  dim_hidden_features, dim_features,
-                                  init='normal')
+        self.mlp = ResidLinearMLP(
+            self.out_dim_cnn,
+            hidden_layers_features,
+            dim_hidden_features,
+            dim_features,
+            init="normal",
+        )
 
-        self.rot_encoder = ResidLinearMLP(dim_features, hidden_layers_rot,
-                                          dim_hidden_rot, dim_rot,
-                                          init='normal')
-        self.trans_encoder = ResidLinearMLP(dim_features, hidden_layers_trans,
-                                            dim_hidden_trans, dim_trans,
-                                            init='normal')
+        self.rot_encoder = ResidLinearMLP(
+            dim_features, hidden_layers_rot, dim_hidden_rot, dim_rot, init="normal"
+        )
+        self.trans_encoder = ResidLinearMLP(
+            dim_features,
+            hidden_layers_trans,
+            dim_hidden_trans,
+            dim_trans,
+            init="normal",
+        )
 
     def extract_features(self, img):
-        """
-        Extract high level visual features from images.
+        """Extract high level visual features from images.
 
         Parameters
         ----------
@@ -138,8 +151,7 @@ class EncoderCryoAI(torch.nn.Module):
         return features
 
     def extract_rot(self, features):
-        """
-        Extract rotations from high level visual features.
+        """Extract rotations from high level visual features.
 
         Parameters
         ----------
@@ -155,8 +167,7 @@ class EncoderCryoAI(torch.nn.Module):
         return rot
 
     def extract_trans(self, features):
-        """
-        Extract rotations from high level visual features.
+        """Extract rotations from high level visual features.
 
         Parameters
         ----------
@@ -172,8 +183,7 @@ class EncoderCryoAI(torch.nn.Module):
         return trans
 
     def forward(self, img):
-        """
-        Extract rotation and translation parameters from images.
+        """Extract rotation and translation parameters from images.
 
         Parameters
         ----------
@@ -196,48 +206,56 @@ class EncoderCryoAI(torch.nn.Module):
 
 
 class ResidLinearMLP(nn.Module):
-    """
-    Residual MLP imported from cryoDRGN2.
+    """Residual MLP imported from cryoDRGN2.
 
-    Reference: Zhong, Ellen D., et al. "CryoDRGN2: Ab initio neural
+    Parameters
+    ----------
+    in_dim: int
+        number of dimensions of the input
+    nlayers: int
+        number of hidden layers
+    hidden_dim: int
+        number of hidden dimensions
+    out_dim: int
+        number of dimensions of the output
+    activation: str
+        activation function ('relu')
+    batchnorm: bool
+        use batch normalization
+    init: str
+        type of initialization ('normal', None)
+
+    Reference
+    ---------
+    Zhong, Ellen D., et al. "CryoDRGN2: Ab initio neural
     reconstruction of 3D protein structures from real cryo-EM images."
     Proceedings of the IEEE/CVF International Conference on Computer Vision.
     2021
     """
 
-    def __init__(self, in_dim, nlayers, hidden_dim, out_dim,
-                 activation='relu', batchnorm=True, init=None):
-        """
-        Initialization of residual MLP.
-
-        Parameters
-        ----------
-        in_dim: int
-            number of dimensions of the input
-        nlayers: int
-            number of hidden layers
-        hidden_dim: int
-            number of hidden dimensions
-        out_dim: int
-            number of dimensions of the output
-        activation: str
-            activation function ('relu')
-        batchnorm: bool
-            use batch normalization
-        init: str
-            type of initialization ('normal', None)
-        """
+    def __init__(
+        self,
+        in_dim,
+        nlayers,
+        hidden_dim,
+        out_dim,
+        activation="relu",
+        batchnorm=True,
+        init=None,
+    ):
         super(ResidLinearMLP, self).__init__()
 
-        if activation == 'relu':
+        if activation == "relu":
             nl = nn.ReLU()
         else:
             raise NotImplementedError
 
-        layers = [ResidLinear(in_dim,
-                              init=init) if in_dim == hidden_dim else nn.Linear(
-            in_dim, hidden_dim),
-                  nl]
+        layers = [
+            ResidLinear(in_dim, init=init)
+            if in_dim == hidden_dim
+            else nn.Linear(in_dim, hidden_dim),
+            nl,
+        ]
 
         if batchnorm:
             layers.append(nn.BatchNorm1d(hidden_dim))
@@ -249,8 +267,10 @@ class ResidLinearMLP(nn.Module):
                 layers.append(nn.BatchNorm1d(hidden_dim))
 
         layers.append(
-            ResidLinear(hidden_dim) if out_dim == hidden_dim else nn.Linear(
-                hidden_dim, out_dim))
+            ResidLinear(hidden_dim)
+            if out_dim == hidden_dim
+            else nn.Linear(hidden_dim, out_dim)
+        )
 
         self.main = nn.Sequential(*layers)
 
@@ -273,27 +293,24 @@ class ResidLinearMLP(nn.Module):
 
 
 class ResidLinear(nn.Module):
-    """Residual linear layer."""
+    """Residual linear layer.
+
+    Parameters
+    ----------
+    dim: int
+        number of dimensions of the input and output
+    init: str
+        type of initialization ('normal', None)
+    """
 
     def __init__(self, dim, init=None):
-        """
-        Initialization of residual linear layer.
-
-        Parameters
-        ----------
-        dim: int
-            number of dimensions of the input and output
-        init: str
-            type of initialization ('normal', None)
-        """
         super(ResidLinear, self).__init__()
         self.linear = nn.Linear(dim, dim)
-        if init == 'normal':
+        if init == "normal":
             init_weights_normal(self.linear)
 
     def forward(self, x):
-        """
-        Forward pass.
+        """Make forward pass.
 
         Parameters
         ----------
@@ -310,29 +327,26 @@ class ResidLinear(nn.Module):
 
 
 class AddCoordinates(nn.Module):
-    """
-    CoordConv layer.
+    """CoordConv layer.
 
-    Reference :Liu, Rosanne, et al. "An intriguing failing of convolutional
+    Parameters
+    ----------
+    with_r: bool
+        Add r coordinates
+
+    Reference
+    ---------
+    Liu, Rosanne, et al. "An intriguing failing of convolutional
     neural networks and the coordconv solution." Advances in neural
     information processing systems 31 (2018)
     """
 
     def __init__(self, with_r=False):
-        """
-        Initialization of CoordConv.
-
-        Parameters
-        ----------
-        with_r: bool
-            Add r coordinates
-        """
         super(AddCoordinates, self).__init__()
         self.with_r = with_r
 
     def forward(self, img):
-        """
-        Forward pass.
+        """Make forward pass.
 
         Parameters
         ----------
@@ -346,17 +360,27 @@ class AddCoordinates(nn.Module):
         """
         batch_size, _, image_height, image_width = img.size()
 
-        y_coords = 2.0 * torch.arange(image_height,
-                                      device=img.device).unsqueeze(
-            1).expand(image_height, image_width) / (image_height - 1.0) - 1.0
-        x_coords = 2.0 * torch.arange(image_width,
-                                      device=img.device).unsqueeze(
-            0).expand(image_height, image_width) / (image_width - 1.0) - 1.0
+        y_coords = (
+            2.0
+            * torch.arange(image_height, device=img.device)
+            .unsqueeze(1)
+            .expand(image_height, image_width)
+            / (image_height - 1.0)
+            - 1.0
+        )
+        x_coords = (
+            2.0
+            * torch.arange(image_width, device=img.device)
+            .unsqueeze(0)
+            .expand(image_height, image_width)
+            / (image_width - 1.0)
+            - 1.0
+        )
 
         coords = torch.stack((y_coords, x_coords), dim=0)
 
         if self.with_r:
-            rs = ((y_coords ** 2) + (x_coords ** 2)) ** 0.5
+            rs = ((y_coords**2) + (x_coords**2)) ** 0.5
             rs = rs / torch.max(rs)
             rs = torch.unsqueeze(rs, dim=0)
             coords = torch.cat((coords, rs), dim=0)
@@ -369,8 +393,7 @@ class AddCoordinates(nn.Module):
 
 
 def init_weights_normal(m):
-    """
-    Initialization of a linear layer with kaiming normal distribution.
+    """Initializen linear layer with kaiming normal distribution.
 
     Parameters
     ----------
@@ -378,8 +401,9 @@ def init_weights_normal(m):
         Linear torch module
     """
     if type(m) is nn.Linear:
-        if hasattr(m, 'weight'):
-            nn.init.kaiming_normal_(m.weight, a=0.0, nonlinearity='relu',
-                                    mode='fan_out')
-        if hasattr(m, 'bias'):
+        if hasattr(m, "weight"):
+            nn.init.kaiming_normal_(
+                m.weight, a=0.0, nonlinearity="relu", mode="fan_out"
+            )
+        if hasattr(m, "bias"):
             nn.init.uniform_(m.bias, -1, 1)
